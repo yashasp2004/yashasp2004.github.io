@@ -42,7 +42,7 @@ window.addEventListener('scroll', () => {
 // Typing animation
 function typeWriter() {
     const textElement = document.querySelector('.typing-text');
-    const texts = ['Cybersecurity Documentation', 'Code Snippets', 'Security Research', 'My Findings'];
+    const texts = ['Code. Document. Share.', 'Explore. Learn. Build.', 'Research. Test. Analyze.', 'Secure. Defend. Protect.'];
     let textIndex = 0;
     let charIndex = 0;
     let isDeleting = false;
@@ -87,10 +87,8 @@ const observer = new IntersectionObserver((entries) => {
 }, observerOptions);
 
 // Observe elements for animation
-document.addEventListener('DOMContentLoaded', () => {
-    document.querySelectorAll('[data-aos]').forEach(el => {
-        observer.observe(el);
-    });
+document.querySelectorAll('[data-aos]').forEach(el => {
+    observer.observe(el);
 });
 
 // Form handling
@@ -109,20 +107,20 @@ if (contactForm) {
     });
 }
 
-// Project item interactions
-document.querySelectorAll('.project-item').forEach(item => {
+// Document item interactions
+document.querySelectorAll('.doc-item').forEach(item => {
     item.addEventListener('click', () => {
-        const projectName = item.querySelector('span').textContent;
-        alert(`Opening project: ${projectName}`);
+        const docName = item.querySelector('span').textContent;
+        alert(`Opening documentation: ${docName}`);
     });
 });
 
-// Snippet card interactions
+// Snippet interactions
 document.querySelectorAll('.snippet-btn').forEach(btn => {
     btn.addEventListener('click', (e) => {
         e.preventDefault();
         const snippetTitle = btn.closest('.snippet-card').querySelector('h3').textContent;
-        alert(`Viewing snippets for: ${snippetTitle}`);
+        alert(`Viewing code snippet: ${snippetTitle}`);
     });
 });
 
@@ -176,24 +174,98 @@ window.addEventListener('scroll', () => {
     scrollProgress.style.width = scrolled + '%';
 });
 
+// Add Easter egg - Konami code
+let konamiCode = '';
+const konami = '38384040373937396665';
+
+document.addEventListener('keydown', (e) => {
+    konamiCode += e.keyCode;
+    if (konamiCode.length > konami.length) {
+        konamiCode = konamiCode.substr(konamiCode.length - konami.length);
+    }
+    if (konamiCode === konami) {
+        document.body.style.filter = 'hue-rotate(180deg)';
+        setTimeout(() => {
+            document.body.style.filter = '';
+        }, 3000);
+        konamiCode = '';
+    }
+});
+
 // Performance optimization - lazy loading for images
 if ('IntersectionObserver' in window) {
     const imageObserver = new IntersectionObserver((entries, observer) => {
         entries.forEach(entry => {
             if (entry.isIntersecting) {
                 const img = entry.target;
-                if (img.dataset.src) {
-                    img.src = img.dataset.src;
-                    img.classList.remove('lazy');
-                    imageObserver.unobserve(img);
-                }
+                img.src = img.dataset.src;
+                img.classList.remove('lazy');
+                imageObserver.unobserve(img);
             }
         });
     });
 
-    document.addEventListener('DOMContentLoaded', () => {
-        document.querySelectorAll('img[data-src]').forEach(img => {
-            imageObserver.observe(img);
-        });
+    document.querySelectorAll('img[data-src]').forEach(img => {
+        imageObserver.observe(img);
     });
 }
+
+// Add matrix rain effect on special occasions
+function matrixRain() {
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+    
+    canvas.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        z-index: -1;
+        opacity: 0.1;
+    `;
+    
+    document.body.appendChild(canvas);
+    
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%^&*()';
+    const fontSize = 14;
+    const columns = canvas.width / fontSize;
+    const drops = new Array(Math.floor(columns)).fill(1);
+    
+    function draw() {
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        
+        ctx.fillStyle = '#00ff88';
+        ctx.font = fontSize + 'px monospace';
+        
+        for (let i = 0; i < drops.length; i++) {
+            const text = chars[Math.floor(Math.random() * chars.length)];
+            ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+            
+            if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+                drops[i] = 0;
+            }
+            drops[i]++;
+        }
+    }
+    
+    const matrixInterval = setInterval(draw, 50);
+    
+    // Stop matrix rain after 10 seconds
+    setTimeout(() => {
+        clearInterval(matrixInterval);
+        canvas.remove();
+    }, 10000);
+}
+
+// Trigger matrix rain on special key combination (Ctrl + Shift + M)
+document.addEventListener('keydown', (e) => {
+    if (e.ctrlKey && e.shiftKey && e.key === 'M') {
+        matrixRain();
+    }
+});
