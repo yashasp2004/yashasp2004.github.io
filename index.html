@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Rutken.me - Cybersecurity Documentation</title>
-    <meta name="description" content="Personal cybersecurity documentation and code snippets at Rutken.me">
+    <title>Rutken.me - Code Snippets & Documentation</title>
+    <meta name="description" content="Personal documentation and code snippets at Rutken.me">
     <link rel="stylesheet" href="styles.css">
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -21,10 +21,10 @@
                     <a href="#home" class="nav-link">Home</a>
                 </li>
                 <li class="nav-item">
-                    <a href="#snippets" class="nav-link">Snippets</a>
+                    <a href="#snippets" class="nav-link">Code Snippets</a>
                 </li>
                 <li class="nav-item">
-                    <a href="#projects" class="nav-link">Projects</a>
+                    <a href="#docs" class="nav-link">Documentation</a>
                 </li>
                 <li class="nav-item">
                     <a href="#about" class="nav-link">About</a>
@@ -43,27 +43,29 @@
 
     <!-- Hero Section -->
     <section id="home" class="hero">
-        <div class="hero-background"></div>
+        <div class="particles-container">
+            <div class="particles"></div>
+        </div>
         <div class="hero-content">
             <h1 class="hero-title">
-                <span class="typing-text">Cybersecurity Documentation</span>
+                <span class="typing-text">Code. Document. Share.</span>
                 <span class="cursor">|</span>
             </h1>
             <p class="hero-subtitle animate-fade-in">
-                Documenting my findings on ethical hacking, penetration testing, and cybersecurity fundamentals
+                Personal documentation and code snippets for cybersecurity and development
             </p>
             <div class="hero-buttons">
-                <a href="#snippets" class="btn btn-primary">Code Snippets</a>
-                <a href="#projects" class="btn btn-secondary">View Projects</a>
+                <a href="#snippets" class="btn btn-primary">View Snippets</a>
+                <a href="#docs" class="btn btn-secondary">Browse Docs</a>
             </div>
         </div>
     </section>
 
-    <!-- Snippets Section (Previously Courses) -->
+    <!-- Code Snippets Section -->
     <section id="snippets" class="snippets">
         <div class="container">
             <h2 class="section-title">Code Snippets</h2>
-            <p class="section-subtitle">Useful cybersecurity code snippets and documentation</p>
+            <p class="section-subtitle">Useful code samples and snippets for quick reference</p>
             
             <div class="snippets-grid">
                 <div class="snippet-card" data-aos="fade-up">
@@ -71,23 +73,25 @@
                         <i class="fas fa-shield-alt"></i>
                     </div>
                     <h3>Network Security</h3>
-                    <p>Tools and techniques for securing networks, implementing firewalls, and detecting intrusions</p>
-                    <div class="snippet-stats">
-                        <span><i class="fas fa-code"></i> 15 snippets</span>
+                    <p>Useful scripts for network scanning and security testing</p>
+                    <div class="snippet-info">
+                        <span><i class="fas fa-code"></i> Python</span>
+                        <span><i class="fas fa-calendar"></i> Updated recently</span>
                     </div>
-                    <a href="#" class="snippet-btn">View Snippets</a>
+                    <a href="#" class="snippet-btn">View Code</a>
                 </div>
 
                 <div class="snippet-card" data-aos="fade-up" data-aos-delay="100">
                     <div class="snippet-icon">
                         <i class="fas fa-bug"></i>
                     </div>
-                    <h3>Penetration Testing</h3>
-                    <p>Scripts and tools for penetration testing and vulnerability assessment techniques</p>
-                    <div class="snippet-stats">
-                        <span><i class="fas fa-code"></i> 22 snippets</span>
+                    <h3>Ethical Hacking</h3>
+                    <p>Scripts and tools for penetration testing and vulnerability assessment</p>
+                    <div class="snippet-info">
+                        <span><i class="fas fa-code"></i> Bash, Python</span>
+                        <span><i class="fas fa-calendar"></i> Updated recently</span>
                     </div>
-                    <a href="#" class="snippet-btn">View Snippets</a>
+                    <a href="#" class="snippet-btn">View Code</a>
                 </div>
 
                 <div class="snippet-card" data-aos="fade-up" data-aos-delay="200">
@@ -95,11 +99,12 @@
                         <i class="fas fa-lock"></i>
                     </div>
                     <h3>Cryptography</h3>
-                    <p>Implementation of encryption, digital signatures, and secure communication protocols</p>
-                    <div class="snippet-stats">
-                        <span><i class="fas fa-code"></i> 8 snippets</span>
+                    <p>Encryption, decryption, and secure communication examples</p>
+                    <div class="snippet-info">
+                        <span><i class="fas fa-code"></i> JavaScript, Python</span>
+                        <span><i class="fas fa-calendar"></i> Updated recently</span>
                     </div>
-                    <a href="#" class="snippet-btn">View Snippets</a>
+                    <a href="#" class="snippet-btn">View Code</a>
                 </div>
 
                 <div class="snippet-card" data-aos="fade-up" data-aos-delay="300">
@@ -107,82 +112,83 @@
                         <i class="fas fa-search"></i>
                     </div>
                     <h3>Digital Forensics</h3>
-                    <p>Tools for digital evidence collection and cybersecurity investigation</p>
-                    <div class="snippet-stats">
-                        <span><i class="fas fa-code"></i> 12 snippets</span>
+                    <p>Tools for digital evidence analysis and investigation</p>
+                    <div class="snippet-info">
+                        <span><i class="fas fa-code"></i> Python, PowerShell</span>
+                        <span><i class="fas fa-calendar"></i> Updated recently</span>
                     </div>
-                    <a href="#" class="snippet-btn">View Snippets</a>
+                    <a href="#" class="snippet-btn">View Code</a>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Projects Section (Previously Labs) -->
-    <section id="projects" class="projects">
+    <!-- Documentation Section -->
+    <section id="docs" class="documentation">
         <div class="container">
-            <h2 class="section-title">Projects</h2>
-            <p class="section-subtitle">Documentation of my cybersecurity projects and research</p>
+            <h2 class="section-title">Documentation</h2>
+            <p class="section-subtitle">Detailed notes and research findings on various topics</p>
             
-            <div class="projects-container">
-                <div class="project-category">
-                    <h3>Recent Projects</h3>
-                    <div class="project-list">
-                        <div class="project-item">
-                            <i class="fas fa-folder-open"></i>
-                            <span>Password Cracking Tool</span>
-                            <span class="project-tag">Python</span>
+            <div class="docs-container">
+                <div class="doc-category">
+                    <h3>Research Notes</h3>
+                    <div class="doc-list">
+                        <div class="doc-item">
+                            <i class="fas fa-file-alt"></i>
+                            <span>Modern Cryptography Methods</span>
+                            <span class="doc-tag">Security</span>
                         </div>
-                        <div class="project-item">
-                            <i class="fas fa-folder-open"></i>
-                            <span>Network Scanner</span>
-                            <span class="project-tag">Python</span>
+                        <div class="doc-item">
+                            <i class="fas fa-file-alt"></i>
+                            <span>Network Traffic Analysis</span>
+                            <span class="doc-tag">Networking</span>
                         </div>
-                        <div class="project-item">
-                            <i class="fas fa-folder-open"></i>
-                            <span>Social Engineering Toolkit</span>
-                            <span class="project-tag">Shell</span>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="project-category">
-                    <h3>Ongoing Research</h3>
-                    <div class="project-list">
-                        <div class="project-item">
-                            <i class="fas fa-folder-open"></i>
-                            <span>SQL Injection Analysis</span>
-                            <span class="project-tag">Web</span>
-                        </div>
-                        <div class="project-item">
-                            <i class="fas fa-folder-open"></i>
-                            <span>XSS Vulnerability Research</span>
-                            <span class="project-tag">Web</span>
-                        </div>
-                        <div class="project-item">
-                            <i class="fas fa-folder-open"></i>
-                            <span>Buffer Overflow Examples</span>
-                            <span class="project-tag">C/C++</span>
+                        <div class="doc-item">
+                            <i class="fas fa-file-alt"></i>
+                            <span>Social Engineering Techniques</span>
+                            <span class="doc-tag">Security</span>
                         </div>
                     </div>
                 </div>
 
-                <div class="project-category">
-                    <h3>Documentation</h3>
-                    <div class="project-list">
-                        <div class="project-item">
-                            <i class="fas fa-folder-open"></i>
-                            <span>APT Analysis Reports</span>
-                            <span class="project-tag">Markdown</span>
+                <div class="doc-category">
+                    <h3>Technical Guides</h3>
+                    <div class="doc-list">
+                        <div class="doc-item">
+                            <i class="fas fa-file-alt"></i>
+                            <span>SQL Injection Prevention</span>
+                            <span class="doc-tag">Web Security</span>
                         </div>
-                        <div class="project-item">
-                            <i class="fas fa-folder-open"></i>
-                            <span>Reverse Engineering Notes</span>
-                            <span class="project-tag">Assembly</span>
+                        <div class="doc-item">
+                            <i class="fas fa-file-alt"></i>
+                            <span>XSS Mitigation Strategies</span>
+                            <span class="doc-tag">Web Security</span>
                         </div>
-                        <div class="project-item">
-                            <i class="fas fa-folder-open"></i>
-                            <span>Exploit Development Guide</span>
-                            <span class="project-tag">Multiple</span>
+                        <div class="doc-item">
+                            <i class="fas fa-file-alt"></i>
+                            <span>Buffer Overflow Analysis</span>
+                            <span class="doc-tag">Exploitation</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="doc-category">
+                    <h3>Tool Documentation</h3>
+                    <div class="doc-list">
+                        <div class="doc-item">
+                            <i class="fas fa-file-alt"></i>
+                            <span>Custom Security Toolkit</span>
+                            <span class="doc-tag">Tools</span>
+                        </div>
+                        <div class="doc-item">
+                            <i class="fas fa-file-alt"></i>
+                            <span>Forensics Framework</span>
+                            <span class="doc-tag">Tools</span>
+                        </div>
+                        <div class="doc-item">
+                            <i class="fas fa-file-alt"></i>
+                            <span>Automated Testing Suite</span>
+                            <span class="doc-tag">Tools</span>
                         </div>
                     </div>
                 </div>
@@ -197,30 +203,29 @@
                 <div class="about-text">
                     <h2 class="section-title">About Rutken.me</h2>
                     <p>
-                        Rutken.me is my personal cybersecurity documentation hub where I share my findings, 
-                        code snippets, and research on various cybersecurity topics. My goal is to document 
-                        my journey in the field and share practical knowledge.
+                        Rutken.me is my personal documentation repository where I share code snippets, research findings,
+                        and technical guides related to cybersecurity and software development.
                     </p>
                     <p>
-                        With a focus on practical application and real-world scenarios, this site serves 
-                        as both a personal knowledge base and a resource for others interested in cybersecurity.
+                        This site serves as both my personal knowledge base and a resource for others interested
+                        in these topics. All content is based on my personal research and experimentation.
                     </p>
                     <div class="features">
                         <div class="feature">
                             <i class="fas fa-check-circle"></i>
-                            <span>Code Snippets & Tools</span>
+                            <span>Detailed Documentation</span>
                         </div>
                         <div class="feature">
                             <i class="fas fa-check-circle"></i>
-                            <span>Research Documentation</span>
+                            <span>Practical Code Examples</span>
                         </div>
                         <div class="feature">
                             <i class="fas fa-check-circle"></i>
-                            <span>Technical Guides</span>
+                            <span>Research-Backed Content</span>
                         </div>
                         <div class="feature">
                             <i class="fas fa-check-circle"></i>
-                            <span>Project Writeups</span>
+                            <span>Regularly Updated</span>
                         </div>
                     </div>
                 </div>
@@ -239,7 +244,7 @@
     <section id="contact" class="contact">
         <div class="container">
             <h2 class="section-title">Get In Touch</h2>
-            <p class="section-subtitle">Have questions or want to collaborate? Reach out!</p>
+            <p class="section-subtitle">Have questions or suggestions about the content? Reach out!</p>
             
             <div class="contact-content">
                 <div class="contact-info">
@@ -247,14 +252,21 @@
                         <i class="fas fa-envelope"></i>
                         <div>
                             <h4>Email</h4>
-                            <p>info@rutken.me</p>
+                            <p>contact@rutken.me</p>
+                        </div>
+                    </div>
+                    <div class="contact-item">
+                        <i class="fas fa-globe"></i>
+                        <div>
+                            <h4>Website</h4>
+                            <p>rutken.me</p>
                         </div>
                     </div>
                     <div class="contact-item">
                         <i class="fas fa-map-marker-alt"></i>
                         <div>
                             <h4>Location</h4>
-                            <p>Global Remote</p>
+                            <p>Digital Space</p>
                         </div>
                     </div>
                 </div>
@@ -269,9 +281,9 @@
                     <div class="form-group">
                         <select id="subject" name="subject" required>
                             <option value="">Select a topic</option>
-                            <option value="question">General Question</option>
+                            <option value="suggestion">Content Suggestion</option>
+                            <option value="question">Technical Question</option>
                             <option value="collaboration">Collaboration</option>
-                            <option value="feedback">Feedback</option>
                             <option value="other">Other</option>
                         </select>
                     </div>
@@ -290,7 +302,7 @@
             <div class="footer-content">
                 <div class="footer-section">
                     <h3>Rutken<span>.me</span></h3>
-                    <p>Personal cybersecurity documentation, research findings, and code snippets.</p>
+                    <p>Personal documentation and code snippets for cybersecurity and software development.</p>
                     <div class="social-links">
                         <a href="#"><i class="fab fa-twitter"></i></a>
                         <a href="#"><i class="fab fa-linkedin"></i></a>
@@ -303,7 +315,7 @@
                     <h4>Quick Links</h4>
                     <ul>
                         <li><a href="#snippets">Code Snippets</a></li>
-                        <li><a href="#projects">Projects</a></li>
+                        <li><a href="#docs">Documentation</a></li>
                         <li><a href="#about">About</a></li>
                         <li><a href="#contact">Contact</a></li>
                     </ul>
@@ -312,9 +324,19 @@
                 <div class="footer-section">
                     <h4>Resources</h4>
                     <ul>
-                        <li><a href="#">Documentation</a></li>
-                        <li><a href="#">Blog</a></li>
+                        <li><a href="#">Latest Updates</a></li>
+                        <li><a href="#">Research Notes</a></li>
                         <li><a href="#">Tools</a></li>
+                        <li><a href="#">FAQ</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-section">
+                    <h4>Legal</h4>
+                    <ul>
+                        <li><a href="#">Privacy Policy</a></li>
+                        <li><a href="#">Terms of Use</a></li>
+                        <li><a href="#">Disclaimer</a></li>
                     </ul>
                 </div>
             </div>
