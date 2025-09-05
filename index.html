@@ -3,37 +3,389 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cybersecurity Learning Platform</title>
+    <title>Rutken.me - Cybersecurity Learning Platform</title>
+    <meta name="description" content="Master cybersecurity with interactive courses, hands-on labs, and expert guidance at Rutken.me">
     <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
-    <header>
-        <h1>Welcome to the Cybersecurity Learning Platform</h1>
-        <nav>
-            <ul>
-                <li><a href="#courses">Courses</a></li>
-                <li><a href="#resources">Resources</a></li>
-                <li><a href="#contact">Contact Us</a></li>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <h2>Rutken<span>.me</span></h2>
+            </div>
+            <ul class="nav-menu">
+                <li class="nav-item">
+                    <a href="#home" class="nav-link">Home</a>
+                </li>
+                <li class="nav-item">
+                    <a href="#courses" class="nav-link">Courses</a>
+                </li>
+                <li class="nav-item">
+                    <a href="#labs" class="nav-link">Labs</a>
+                </li>
+                <li class="nav-item">
+                    <a href="#about" class="nav-link">About</a>
+                </li>
+                <li class="nav-item">
+                    <a href="#contact" class="nav-link">Contact</a>
+                </li>
             </ul>
-        </nav>
-    </header>
-    <main>
-        <section id="courses">
-            <h2>Our Courses</h2>
-            <p>Explore our comprehensive courses on cybersecurity.</p>
-        </section>
-        <section id="resources">
-            <h2>Resources</h2>
-            <p>Access a variety of resources to enhance your learning.</p>
-        </section>
-        <section id="contact">
-            <h2>Contact Us</h2>
-            <p>Get in touch for more information.</p>
-        </section>
-    </main>
-    <footer>
-        <p>&copy; 2023 Cybersecurity Learning Platform</p>
+            <div class="nav-toggle">
+                <span class="bar"></span>
+                <span class="bar"></span>
+                <span class="bar"></span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section id="home" class="hero">
+        <div class="particles"></div>
+        <div class="hero-content">
+            <h1 class="hero-title">
+                <span class="typing-text">Master Cybersecurity</span>
+                <span class="cursor">|</span>
+            </h1>
+            <p class="hero-subtitle animate-fade-in">
+                Learn ethical hacking, penetration testing, and cybersecurity fundamentals through hands-on experience
+            </p>
+            <div class="hero-buttons">
+                <a href="#courses" class="btn btn-primary">Start Learning</a>
+                <a href="#labs" class="btn btn-secondary">Try Labs</a>
+            </div>
+        </div>
+        <div class="hero-stats">
+            <div class="stat-item">
+                <span class="stat-number" data-target="10000">0</span>
+                <span class="stat-label">Students</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-number" data-target="50">0</span>
+                <span class="stat-label">Courses</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-number" data-target="1000">0</span>
+                <span class="stat-label">Labs</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- Courses Section -->
+    <section id="courses" class="courses">
+        <div class="container">
+            <h2 class="section-title">Cybersecurity Courses</h2>
+            <p class="section-subtitle">Choose your learning path and become a cybersecurity expert</p>
+            
+            <div class="courses-grid">
+                <div class="course-card" data-aos="fade-up">
+                    <div class="course-icon">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <h3>Network Security</h3>
+                    <p>Learn to secure networks, implement firewalls, and detect intrusions</p>
+                    <div class="course-stats">
+                        <span><i class="fas fa-clock"></i> 40 hours</span>
+                        <span><i class="fas fa-users"></i> 2.5k students</span>
+                    </div>
+                    <a href="#" class="course-btn">Start Course</a>
+                </div>
+
+                <div class="course-card" data-aos="fade-up" data-aos-delay="100">
+                    <div class="course-icon">
+                        <i class="fas fa-bug"></i>
+                    </div>
+                    <h3>Ethical Hacking</h3>
+                    <p>Master penetration testing and vulnerability assessment techniques</p>
+                    <div class="course-stats">
+                        <span><i class="fas fa-clock"></i> 60 hours</span>
+                        <span><i class="fas fa-users"></i> 3.2k students</span>
+                    </div>
+                    <a href="#" class="course-btn">Start Course</a>
+                </div>
+
+                <div class="course-card" data-aos="fade-up" data-aos-delay="200">
+                    <div class="course-icon">
+                        <i class="fas fa-lock"></i>
+                    </div>
+                    <h3>Cryptography</h3>
+                    <p>Understand encryption, digital signatures, and secure communication</p>
+                    <div class="course-stats">
+                        <span><i class="fas fa-clock"></i> 35 hours</span>
+                        <span><i class="fas fa-users"></i> 1.8k students</span>
+                    </div>
+                    <a href="#" class="course-btn">Start Course</a>
+                </div>
+
+                <div class="course-card" data-aos="fade-up" data-aos-delay="300">
+                    <div class="course-icon">
+                        <i class="fas fa-search"></i>
+                    </div>
+                    <h3>Digital Forensics</h3>
+                    <p>Investigate cyber crimes and analyze digital evidence</p>
+                    <div class="course-stats">
+                        <span><i class="fas fa-clock"></i> 45 hours</span>
+                        <span><i class="fas fa-users"></i> 1.5k students</span>
+                    </div>
+                    <a href="#" class="course-btn">Start Course</a>
+                </div>
+
+                <div class="course-card" data-aos="fade-up" data-aos-delay="400">
+                    <div class="course-icon">
+                        <i class="fas fa-cloud"></i>
+                    </div>
+                    <h3>Cloud Security</h3>
+                    <p>Secure cloud infrastructure and implement best practices</p>
+                    <div class="course-stats">
+                        <span><i class="fas fa-clock"></i> 50 hours</span>
+                        <span><i class="fas fa-users"></i> 2.1k students</span>
+                    </div>
+                    <a href="#" class="course-btn">Start Course</a>
+                </div>
+
+                <div class="course-card" data-aos="fade-up" data-aos-delay="500">
+                    <div class="course-icon">
+                        <i class="fas fa-mobile-alt"></i>
+                    </div>
+                    <h3>Mobile Security</h3>
+                    <p>Secure mobile applications and understand mobile threats</p>
+                    <div class="course-stats">
+                        <span><i class="fas fa-clock"></i> 30 hours</span>
+                        <span><i class="fas fa-users"></i> 1.2k students</span>
+                    </div>
+                    <a href="#" class="course-btn">Start Course</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Labs Section -->
+    <section id="labs" class="labs">
+        <div class="container">
+            <h2 class="section-title">Hands-on Labs</h2>
+            <p class="section-subtitle">Practice your skills in our interactive cybersecurity labs</p>
+            
+            <div class="labs-container">
+                <div class="lab-category">
+                    <h3>Beginner Labs</h3>
+                    <div class="lab-list">
+                        <div class="lab-item">
+                            <i class="fas fa-play-circle"></i>
+                            <span>Password Cracking Basics</span>
+                            <span class="lab-difficulty easy">Easy</span>
+                        </div>
+                        <div class="lab-item">
+                            <i class="fas fa-play-circle"></i>
+                            <span>Network Scanning</span>
+                            <span class="lab-difficulty easy">Easy</span>
+                        </div>
+                        <div class="lab-item">
+                            <i class="fas fa-play-circle"></i>
+                            <span>Social Engineering Awareness</span>
+                            <span class="lab-difficulty easy">Easy</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="lab-category">
+                    <h3>Intermediate Labs</h3>
+                    <div class="lab-list">
+                        <div class="lab-item">
+                            <i class="fas fa-play-circle"></i>
+                            <span>SQL Injection</span>
+                            <span class="lab-difficulty medium">Medium</span>
+                        </div>
+                        <div class="lab-item">
+                            <i class="fas fa-play-circle"></i>
+                            <span>Cross-Site Scripting (XSS)</span>
+                            <span class="lab-difficulty medium">Medium</span>
+                        </div>
+                        <div class="lab-item">
+                            <i class="fas fa-play-circle"></i>
+                            <span>Buffer Overflow</span>
+                            <span class="lab-difficulty medium">Medium</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="lab-category">
+                    <h3>Advanced Labs</h3>
+                    <div class="lab-list">
+                        <div class="lab-item">
+                            <i class="fas fa-play-circle"></i>
+                            <span>Advanced Persistent Threats</span>
+                            <span class="lab-difficulty hard">Hard</span>
+                        </div>
+                        <div class="lab-item">
+                            <i class="fas fa-play-circle"></i>
+                            <span>Reverse Engineering</span>
+                            <span class="lab-difficulty hard">Hard</span>
+                        </div>
+                        <div class="lab-item">
+                            <i class="fas fa-play-circle"></i>
+                            <span>Zero-Day Exploitation</span>
+                            <span class="lab-difficulty hard">Hard</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="about">
+        <div class="container">
+            <div class="about-content">
+                <div class="about-text">
+                    <h2 class="section-title">About Rutken.me</h2>
+                    <p>
+                        Rutken.me is a cutting-edge cybersecurity learning platform designed to bridge the gap between 
+                        theoretical knowledge and practical skills. Our mission is to democratize cybersecurity education 
+                        and create the next generation of ethical hackers and security professionals.
+                    </p>
+                    <p>
+                        With industry-leading instructors, hands-on labs, and real-world scenarios, we provide 
+                        comprehensive training that prepares you for the challenges of modern cybersecurity.
+                    </p>
+                    <div class="features">
+                        <div class="feature">
+                            <i class="fas fa-check-circle"></i>
+                            <span>Interactive Learning Environment</span>
+                        </div>
+                        <div class="feature">
+                            <i class="fas fa-check-circle"></i>
+                            <span>Industry-Recognized Certifications</span>
+                        </div>
+                        <div class="feature">
+                            <i class="fas fa-check-circle"></i>
+                            <span>24/7 Expert Support</span>
+                        </div>
+                        <div class="feature">
+                            <i class="fas fa-check-circle"></i>
+                            <span>Real-World Projects</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="about-image">
+                    <div class="cyber-graphic">
+                        <div class="cyber-circle"></div>
+                        <div class="cyber-lines"></div>
+                        <div class="cyber-dots"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact" class="contact">
+        <div class="container">
+            <h2 class="section-title">Get In Touch</h2>
+            <p class="section-subtitle">Ready to start your cybersecurity journey? Contact us today!</p>
+            
+            <div class="contact-content">
+                <div class="contact-info">
+                    <div class="contact-item">
+                        <i class="fas fa-envelope"></i>
+                        <div>
+                            <h4>Email</h4>
+                            <p>info@rutken.me</p>
+                        </div>
+                    </div>
+                    <div class="contact-item">
+                        <i class="fas fa-phone"></i>
+                        <div>
+                            <h4>Phone</h4>
+                            <p>+1 (555) 123-4567</p>
+                        </div>
+                    </div>
+                    <div class="contact-item">
+                        <i class="fas fa-map-marker-alt"></i>
+                        <div>
+                            <h4>Address</h4>
+                            <p>Global Online Platform</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <form class="contact-form">
+                    <div class="form-group">
+                        <input type="text" id="name" name="name" placeholder="Your Name" required>
+                    </div>
+                    <div class="form-group">
+                        <input type="email" id="email" name="email" placeholder="Your Email" required>
+                    </div>
+                    <div class="form-group">
+                        <select id="subject" name="subject" required>
+                            <option value="">Select a topic</option>
+                            <option value="course">Course Information</option>
+                            <option value="support">Technical Support</option>
+                            <option value="partnership">Partnership</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <textarea id="message" name="message" placeholder="Your Message" rows="5" required></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Send Message</button>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>Rutken<span>.me</span></h3>
+                    <p>Empowering the next generation of cybersecurity professionals through innovative education and hands-on experience.</p>
+                    <div class="social-links">
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-linkedin"></i></a>
+                        <a href="#"><i class="fab fa-github"></i></a>
+                        <a href="#"><i class="fab fa-discord"></i></a>
+                    </div>
+                </div>
+                
+                <div class="footer-section">
+                    <h4>Quick Links</h4>
+                    <ul>
+                        <li><a href="#courses">Courses</a></li>
+                        <li><a href="#labs">Labs</a></li>
+                        <li><a href="#about">About</a></li>
+                        <li><a href="#contact">Contact</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-section">
+                    <h4>Resources</h4>
+                    <ul>
+                        <li><a href="#">Documentation</a></li>
+                        <li><a href="#">Community</a></li>
+                        <li><a href="#">Blog</a></li>
+                        <li><a href="#">FAQ</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-section">
+                    <h4>Legal</h4>
+                    <ul>
+                        <li><a href="#">Privacy Policy</a></li>
+                        <li><a href="#">Terms of Service</a></li>
+                        <li><a href="#">Cookie Policy</a></li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="footer-bottom">
+                <p>&copy; 2024 Rutken.me. All rights reserved.</p>
+            </div>
+        </div>
     </footer>
+
     <script src="script.js"></script>
 </body>
 </html>
