@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Rutken.me - Cybersecurity Learning Platform</title>
-    <meta name="description" content="Master cybersecurity with interactive courses, hands-on labs, and expert guidance at Rutken.me">
+    <title>Rutken.me - Cybersecurity Documentation</title>
+    <meta name="description" content="Personal cybersecurity documentation and code snippets at Rutken.me">
     <link rel="stylesheet" href="styles.css">
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -21,10 +21,10 @@
                     <a href="#home" class="nav-link">Home</a>
                 </li>
                 <li class="nav-item">
-                    <a href="#courses" class="nav-link">Courses</a>
+                    <a href="#snippets" class="nav-link">Snippets</a>
                 </li>
                 <li class="nav-item">
-                    <a href="#labs" class="nav-link">Labs</a>
+                    <a href="#projects" class="nav-link">Projects</a>
                 </li>
                 <li class="nav-item">
                     <a href="#about" class="nav-link">About</a>
@@ -43,190 +43,146 @@
 
     <!-- Hero Section -->
     <section id="home" class="hero">
-        <div class="particles"></div>
+        <div class="hero-background"></div>
         <div class="hero-content">
             <h1 class="hero-title">
-                <span class="typing-text">Master Cybersecurity</span>
+                <span class="typing-text">Cybersecurity Documentation</span>
                 <span class="cursor">|</span>
             </h1>
             <p class="hero-subtitle animate-fade-in">
-                Learn ethical hacking, penetration testing, and cybersecurity fundamentals through hands-on experience
+                Documenting my findings on ethical hacking, penetration testing, and cybersecurity fundamentals
             </p>
             <div class="hero-buttons">
-                <a href="#courses" class="btn btn-primary">Start Learning</a>
-                <a href="#labs" class="btn btn-secondary">Try Labs</a>
-            </div>
-        </div>
-        <div class="hero-stats">
-            <div class="stat-item">
-                <span class="stat-number" data-target="10000">0</span>
-                <span class="stat-label">Students</span>
-            </div>
-            <div class="stat-item">
-                <span class="stat-number" data-target="50">0</span>
-                <span class="stat-label">Courses</span>
-            </div>
-            <div class="stat-item">
-                <span class="stat-number" data-target="1000">0</span>
-                <span class="stat-label">Labs</span>
+                <a href="#snippets" class="btn btn-primary">Code Snippets</a>
+                <a href="#projects" class="btn btn-secondary">View Projects</a>
             </div>
         </div>
     </section>
 
-    <!-- Courses Section -->
-    <section id="courses" class="courses">
+    <!-- Snippets Section (Previously Courses) -->
+    <section id="snippets" class="snippets">
         <div class="container">
-            <h2 class="section-title">Cybersecurity Courses</h2>
-            <p class="section-subtitle">Choose your learning path and become a cybersecurity expert</p>
+            <h2 class="section-title">Code Snippets</h2>
+            <p class="section-subtitle">Useful cybersecurity code snippets and documentation</p>
             
-            <div class="courses-grid">
-                <div class="course-card" data-aos="fade-up">
-                    <div class="course-icon">
+            <div class="snippets-grid">
+                <div class="snippet-card" data-aos="fade-up">
+                    <div class="snippet-icon">
                         <i class="fas fa-shield-alt"></i>
                     </div>
                     <h3>Network Security</h3>
-                    <p>Learn to secure networks, implement firewalls, and detect intrusions</p>
-                    <div class="course-stats">
-                        <span><i class="fas fa-clock"></i> 40 hours</span>
-                        <span><i class="fas fa-users"></i> 2.5k students</span>
+                    <p>Tools and techniques for securing networks, implementing firewalls, and detecting intrusions</p>
+                    <div class="snippet-stats">
+                        <span><i class="fas fa-code"></i> 15 snippets</span>
                     </div>
-                    <a href="#" class="course-btn">Start Course</a>
+                    <a href="#" class="snippet-btn">View Snippets</a>
                 </div>
 
-                <div class="course-card" data-aos="fade-up" data-aos-delay="100">
-                    <div class="course-icon">
+                <div class="snippet-card" data-aos="fade-up" data-aos-delay="100">
+                    <div class="snippet-icon">
                         <i class="fas fa-bug"></i>
                     </div>
-                    <h3>Ethical Hacking</h3>
-                    <p>Master penetration testing and vulnerability assessment techniques</p>
-                    <div class="course-stats">
-                        <span><i class="fas fa-clock"></i> 60 hours</span>
-                        <span><i class="fas fa-users"></i> 3.2k students</span>
+                    <h3>Penetration Testing</h3>
+                    <p>Scripts and tools for penetration testing and vulnerability assessment techniques</p>
+                    <div class="snippet-stats">
+                        <span><i class="fas fa-code"></i> 22 snippets</span>
                     </div>
-                    <a href="#" class="course-btn">Start Course</a>
+                    <a href="#" class="snippet-btn">View Snippets</a>
                 </div>
 
-                <div class="course-card" data-aos="fade-up" data-aos-delay="200">
-                    <div class="course-icon">
+                <div class="snippet-card" data-aos="fade-up" data-aos-delay="200">
+                    <div class="snippet-icon">
                         <i class="fas fa-lock"></i>
                     </div>
                     <h3>Cryptography</h3>
-                    <p>Understand encryption, digital signatures, and secure communication</p>
-                    <div class="course-stats">
-                        <span><i class="fas fa-clock"></i> 35 hours</span>
-                        <span><i class="fas fa-users"></i> 1.8k students</span>
+                    <p>Implementation of encryption, digital signatures, and secure communication protocols</p>
+                    <div class="snippet-stats">
+                        <span><i class="fas fa-code"></i> 8 snippets</span>
                     </div>
-                    <a href="#" class="course-btn">Start Course</a>
+                    <a href="#" class="snippet-btn">View Snippets</a>
                 </div>
 
-                <div class="course-card" data-aos="fade-up" data-aos-delay="300">
-                    <div class="course-icon">
+                <div class="snippet-card" data-aos="fade-up" data-aos-delay="300">
+                    <div class="snippet-icon">
                         <i class="fas fa-search"></i>
                     </div>
                     <h3>Digital Forensics</h3>
-                    <p>Investigate cyber crimes and analyze digital evidence</p>
-                    <div class="course-stats">
-                        <span><i class="fas fa-clock"></i> 45 hours</span>
-                        <span><i class="fas fa-users"></i> 1.5k students</span>
+                    <p>Tools for digital evidence collection and cybersecurity investigation</p>
+                    <div class="snippet-stats">
+                        <span><i class="fas fa-code"></i> 12 snippets</span>
                     </div>
-                    <a href="#" class="course-btn">Start Course</a>
-                </div>
-
-                <div class="course-card" data-aos="fade-up" data-aos-delay="400">
-                    <div class="course-icon">
-                        <i class="fas fa-cloud"></i>
-                    </div>
-                    <h3>Cloud Security</h3>
-                    <p>Secure cloud infrastructure and implement best practices</p>
-                    <div class="course-stats">
-                        <span><i class="fas fa-clock"></i> 50 hours</span>
-                        <span><i class="fas fa-users"></i> 2.1k students</span>
-                    </div>
-                    <a href="#" class="course-btn">Start Course</a>
-                </div>
-
-                <div class="course-card" data-aos="fade-up" data-aos-delay="500">
-                    <div class="course-icon">
-                        <i class="fas fa-mobile-alt"></i>
-                    </div>
-                    <h3>Mobile Security</h3>
-                    <p>Secure mobile applications and understand mobile threats</p>
-                    <div class="course-stats">
-                        <span><i class="fas fa-clock"></i> 30 hours</span>
-                        <span><i class="fas fa-users"></i> 1.2k students</span>
-                    </div>
-                    <a href="#" class="course-btn">Start Course</a>
+                    <a href="#" class="snippet-btn">View Snippets</a>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Labs Section -->
-    <section id="labs" class="labs">
+    <!-- Projects Section (Previously Labs) -->
+    <section id="projects" class="projects">
         <div class="container">
-            <h2 class="section-title">Hands-on Labs</h2>
-            <p class="section-subtitle">Practice your skills in our interactive cybersecurity labs</p>
+            <h2 class="section-title">Projects</h2>
+            <p class="section-subtitle">Documentation of my cybersecurity projects and research</p>
             
-            <div class="labs-container">
-                <div class="lab-category">
-                    <h3>Beginner Labs</h3>
-                    <div class="lab-list">
-                        <div class="lab-item">
-                            <i class="fas fa-play-circle"></i>
-                            <span>Password Cracking Basics</span>
-                            <span class="lab-difficulty easy">Easy</span>
+            <div class="projects-container">
+                <div class="project-category">
+                    <h3>Recent Projects</h3>
+                    <div class="project-list">
+                        <div class="project-item">
+                            <i class="fas fa-folder-open"></i>
+                            <span>Password Cracking Tool</span>
+                            <span class="project-tag">Python</span>
                         </div>
-                        <div class="lab-item">
-                            <i class="fas fa-play-circle"></i>
-                            <span>Network Scanning</span>
-                            <span class="lab-difficulty easy">Easy</span>
+                        <div class="project-item">
+                            <i class="fas fa-folder-open"></i>
+                            <span>Network Scanner</span>
+                            <span class="project-tag">Python</span>
                         </div>
-                        <div class="lab-item">
-                            <i class="fas fa-play-circle"></i>
-                            <span>Social Engineering Awareness</span>
-                            <span class="lab-difficulty easy">Easy</span>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="lab-category">
-                    <h3>Intermediate Labs</h3>
-                    <div class="lab-list">
-                        <div class="lab-item">
-                            <i class="fas fa-play-circle"></i>
-                            <span>SQL Injection</span>
-                            <span class="lab-difficulty medium">Medium</span>
-                        </div>
-                        <div class="lab-item">
-                            <i class="fas fa-play-circle"></i>
-                            <span>Cross-Site Scripting (XSS)</span>
-                            <span class="lab-difficulty medium">Medium</span>
-                        </div>
-                        <div class="lab-item">
-                            <i class="fas fa-play-circle"></i>
-                            <span>Buffer Overflow</span>
-                            <span class="lab-difficulty medium">Medium</span>
+                        <div class="project-item">
+                            <i class="fas fa-folder-open"></i>
+                            <span>Social Engineering Toolkit</span>
+                            <span class="project-tag">Shell</span>
                         </div>
                     </div>
                 </div>
 
-                <div class="lab-category">
-                    <h3>Advanced Labs</h3>
-                    <div class="lab-list">
-                        <div class="lab-item">
-                            <i class="fas fa-play-circle"></i>
-                            <span>Advanced Persistent Threats</span>
-                            <span class="lab-difficulty hard">Hard</span>
+                <div class="project-category">
+                    <h3>Ongoing Research</h3>
+                    <div class="project-list">
+                        <div class="project-item">
+                            <i class="fas fa-folder-open"></i>
+                            <span>SQL Injection Analysis</span>
+                            <span class="project-tag">Web</span>
                         </div>
-                        <div class="lab-item">
-                            <i class="fas fa-play-circle"></i>
-                            <span>Reverse Engineering</span>
-                            <span class="lab-difficulty hard">Hard</span>
+                        <div class="project-item">
+                            <i class="fas fa-folder-open"></i>
+                            <span>XSS Vulnerability Research</span>
+                            <span class="project-tag">Web</span>
                         </div>
-                        <div class="lab-item">
-                            <i class="fas fa-play-circle"></i>
-                            <span>Zero-Day Exploitation</span>
-                            <span class="lab-difficulty hard">Hard</span>
+                        <div class="project-item">
+                            <i class="fas fa-folder-open"></i>
+                            <span>Buffer Overflow Examples</span>
+                            <span class="project-tag">C/C++</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="project-category">
+                    <h3>Documentation</h3>
+                    <div class="project-list">
+                        <div class="project-item">
+                            <i class="fas fa-folder-open"></i>
+                            <span>APT Analysis Reports</span>
+                            <span class="project-tag">Markdown</span>
+                        </div>
+                        <div class="project-item">
+                            <i class="fas fa-folder-open"></i>
+                            <span>Reverse Engineering Notes</span>
+                            <span class="project-tag">Assembly</span>
+                        </div>
+                        <div class="project-item">
+                            <i class="fas fa-folder-open"></i>
+                            <span>Exploit Development Guide</span>
+                            <span class="project-tag">Multiple</span>
                         </div>
                     </div>
                 </div>
@@ -241,30 +197,30 @@
                 <div class="about-text">
                     <h2 class="section-title">About Rutken.me</h2>
                     <p>
-                        Rutken.me is a cutting-edge cybersecurity learning platform designed to bridge the gap between 
-                        theoretical knowledge and practical skills. Our mission is to democratize cybersecurity education 
-                        and create the next generation of ethical hackers and security professionals.
+                        Rutken.me is my personal cybersecurity documentation hub where I share my findings, 
+                        code snippets, and research on various cybersecurity topics. My goal is to document 
+                        my journey in the field and share practical knowledge.
                     </p>
                     <p>
-                        With industry-leading instructors, hands-on labs, and real-world scenarios, we provide 
-                        comprehensive training that prepares you for the challenges of modern cybersecurity.
+                        With a focus on practical application and real-world scenarios, this site serves 
+                        as both a personal knowledge base and a resource for others interested in cybersecurity.
                     </p>
                     <div class="features">
                         <div class="feature">
                             <i class="fas fa-check-circle"></i>
-                            <span>Interactive Learning Environment</span>
+                            <span>Code Snippets & Tools</span>
                         </div>
                         <div class="feature">
                             <i class="fas fa-check-circle"></i>
-                            <span>Industry-Recognized Certifications</span>
+                            <span>Research Documentation</span>
                         </div>
                         <div class="feature">
                             <i class="fas fa-check-circle"></i>
-                            <span>24/7 Expert Support</span>
+                            <span>Technical Guides</span>
                         </div>
                         <div class="feature">
                             <i class="fas fa-check-circle"></i>
-                            <span>Real-World Projects</span>
+                            <span>Project Writeups</span>
                         </div>
                     </div>
                 </div>
@@ -283,7 +239,7 @@
     <section id="contact" class="contact">
         <div class="container">
             <h2 class="section-title">Get In Touch</h2>
-            <p class="section-subtitle">Ready to start your cybersecurity journey? Contact us today!</p>
+            <p class="section-subtitle">Have questions or want to collaborate? Reach out!</p>
             
             <div class="contact-content">
                 <div class="contact-info">
@@ -295,17 +251,10 @@
                         </div>
                     </div>
                     <div class="contact-item">
-                        <i class="fas fa-phone"></i>
-                        <div>
-                            <h4>Phone</h4>
-                            <p>+1 (555) 123-4567</p>
-                        </div>
-                    </div>
-                    <div class="contact-item">
                         <i class="fas fa-map-marker-alt"></i>
                         <div>
-                            <h4>Address</h4>
-                            <p>Global Online Platform</p>
+                            <h4>Location</h4>
+                            <p>Global Remote</p>
                         </div>
                     </div>
                 </div>
@@ -320,9 +269,9 @@
                     <div class="form-group">
                         <select id="subject" name="subject" required>
                             <option value="">Select a topic</option>
-                            <option value="course">Course Information</option>
-                            <option value="support">Technical Support</option>
-                            <option value="partnership">Partnership</option>
+                            <option value="question">General Question</option>
+                            <option value="collaboration">Collaboration</option>
+                            <option value="feedback">Feedback</option>
                             <option value="other">Other</option>
                         </select>
                     </div>
@@ -341,7 +290,7 @@
             <div class="footer-content">
                 <div class="footer-section">
                     <h3>Rutken<span>.me</span></h3>
-                    <p>Empowering the next generation of cybersecurity professionals through innovative education and hands-on experience.</p>
+                    <p>Personal cybersecurity documentation, research findings, and code snippets.</p>
                     <div class="social-links">
                         <a href="#"><i class="fab fa-twitter"></i></a>
                         <a href="#"><i class="fab fa-linkedin"></i></a>
@@ -353,8 +302,8 @@
                 <div class="footer-section">
                     <h4>Quick Links</h4>
                     <ul>
-                        <li><a href="#courses">Courses</a></li>
-                        <li><a href="#labs">Labs</a></li>
+                        <li><a href="#snippets">Code Snippets</a></li>
+                        <li><a href="#projects">Projects</a></li>
                         <li><a href="#about">About</a></li>
                         <li><a href="#contact">Contact</a></li>
                     </ul>
@@ -364,18 +313,8 @@
                     <h4>Resources</h4>
                     <ul>
                         <li><a href="#">Documentation</a></li>
-                        <li><a href="#">Community</a></li>
                         <li><a href="#">Blog</a></li>
-                        <li><a href="#">FAQ</a></li>
-                    </ul>
-                </div>
-                
-                <div class="footer-section">
-                    <h4>Legal</h4>
-                    <ul>
-                        <li><a href="#">Privacy Policy</a></li>
-                        <li><a href="#">Terms of Service</a></li>
-                        <li><a href="#">Cookie Policy</a></li>
+                        <li><a href="#">Tools</a></li>
                     </ul>
                 </div>
             </div>
