@@ -129,20 +129,39 @@ body {
     overflow: hidden;
 }
 
-.particles {
+/* Fixed background animation */
+.hero-background {
     position: absolute;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="10" cy="10" r="1" fill="%2300ff88" opacity="0.3"><animate attributeName="opacity" values="0.3;1;0.3" dur="2s" repeatCount="indefinite"/></circle><circle cx="30" cy="70" r="1" fill="%230066ff" opacity="0.3"><animate attributeName="opacity" values="0.3;1;0.3" dur="3s" repeatCount="indefinite"/></circle><circle cx="70" cy="30" r="1" fill="%23ff0066" opacity="0.3"><animate attributeName="opacity" values="0.3;1;0.3" dur="2.5s" repeatCount="indefinite"/></circle><circle cx="90" cy="80" r="1" fill="%2300ff88" opacity="0.3"><animate attributeName="opacity" values="0.3;1;0.3" dur="1.8s" repeatCount="indefinite"/></circle></svg>') repeat;
-    animation: float 20s linear infinite;
+    background-image: radial-gradient(circle, rgba(0, 255, 136, 0.1) 2px, transparent 3px),
+                    radial-gradient(circle, rgba(0, 102, 255, 0.1) 2px, transparent 3px),
+                    radial-gradient(circle, rgba(255, 0, 102, 0.1) 2px, transparent 3px);
+    background-size: 50px 50px, 60px 60px, 70px 70px;
+    background-position: 0 0, 25px 25px, 35px 35px;
+    opacity: 0.3;
+    animation: subtleMove 20s linear infinite;
+    z-index: 0;
 }
 
-@keyframes float {
-    0% { transform: translateY(0px) translateX(0px); }
-    50% { transform: translateY(-20px) translateX(10px); }
-    100% { transform: translateY(0px) translateX(0px); }
+@keyframes subtleMove {
+    0% {
+        transform: translate(0, 0);
+    }
+    25% {
+        transform: translate(-5px, 5px);
+    }
+    50% {
+        transform: translate(5px, 0px);
+    }
+    75% {
+        transform: translate(0px, -5px);
+    }
+    100% {
+        transform: translate(0, 0);
+    }
 }
 
 .hero-content {
@@ -166,6 +185,7 @@ body {
 .typing-text {
     border-right: 2px solid var(--primary-color);
     animation: typing 3s steps(20) infinite;
+    display: inline-block;
 }
 
 .cursor {
@@ -234,35 +254,6 @@ body {
     transform: translateY(-3px);
 }
 
-.hero-stats {
-    display: flex;
-    gap: 3rem;
-    margin-top: 3rem;
-    justify-content: center;
-    flex-wrap: wrap;
-    opacity: 0;
-    animation: fadeInUp 1s ease 1.5s forwards;
-}
-
-.stat-item {
-    text-align: center;
-}
-
-.stat-number {
-    font-family: 'Orbitron', monospace;
-    font-size: 2.5rem;
-    font-weight: 900;
-    color: var(--primary-color);
-    display: block;
-}
-
-.stat-label {
-    color: var(--text-secondary);
-    font-size: 0.9rem;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-}
-
 @keyframes fadeInUp {
     from {
         opacity: 0;
@@ -305,19 +296,19 @@ section {
     margin-right: auto;
 }
 
-/* Courses Section */
-.courses {
+/* Snippets Section (Formerly Courses) */
+.snippets {
     background: var(--bg-darker);
 }
 
-.courses-grid {
+.snippets-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
     gap: 2rem;
     margin-top: 3rem;
 }
 
-.course-card {
+.snippet-card {
     background: var(--card-bg);
     border: 1px solid var(--border-color);
     border-radius: 20px;
@@ -328,7 +319,7 @@ section {
     overflow: hidden;
 }
 
-.course-card::before {
+.snippet-card::before {
     content: '';
     position: absolute;
     top: 0;
@@ -341,17 +332,17 @@ section {
     pointer-events: none;
 }
 
-.course-card:hover::before {
+.snippet-card:hover::before {
     opacity: 1;
 }
 
-.course-card:hover {
+.snippet-card:hover {
     transform: translateY(-10px);
     border-color: var(--primary-color);
     box-shadow: 0 20px 40px rgba(0, 255, 136, 0.1);
 }
 
-.course-icon {
+.snippet-icon {
     width: 80px;
     height: 80px;
     margin: 0 auto 1.5rem;
@@ -364,27 +355,27 @@ section {
     color: var(--bg-dark);
 }
 
-.course-card h3 {
+.snippet-card h3 {
     font-size: 1.5rem;
     margin-bottom: 1rem;
     color: var(--text-primary);
 }
 
-.course-card p {
+.snippet-card p {
     color: var(--text-secondary);
     margin-bottom: 1.5rem;
     line-height: 1.6;
 }
 
-.course-stats {
+.snippet-stats {
     display: flex;
-    justify-content: space-between;
+    justify-content: center;
     margin-bottom: 1.5rem;
     font-size: 0.9rem;
     color: var(--text-muted);
 }
 
-.course-btn {
+.snippet-btn {
     background: transparent;
     color: var(--primary-color);
     border: 2px solid var(--primary-color);
@@ -396,37 +387,37 @@ section {
     display: inline-block;
 }
 
-.course-btn:hover {
+.snippet-btn:hover {
     background: var(--primary-color);
     color: var(--bg-dark);
 }
 
-/* Labs Section */
-.labs-container {
+/* Projects Section (Formerly Labs) */
+.projects-container {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
     gap: 2rem;
     margin-top: 3rem;
 }
 
-.lab-category {
+.project-category {
     background: var(--card-bg);
     border: 1px solid var(--border-color);
     border-radius: 15px;
     padding: 2rem;
 }
 
-.lab-category h3 {
+.project-category h3 {
     color: var(--primary-color);
     margin-bottom: 1.5rem;
     font-size: 1.3rem;
 }
 
-.lab-list {
+.project-list {
     space-y: 1rem;
 }
 
-.lab-item {
+.project-item {
     display: flex;
     align-items: center;
     gap: 1rem;
@@ -438,37 +429,24 @@ section {
     cursor: pointer;
 }
 
-.lab-item:hover {
+.project-item:hover {
     background: rgba(0, 255, 136, 0.1);
     transform: translateX(5px);
 }
 
-.lab-item i {
+.project-item i {
     color: var(--primary-color);
     font-size: 1.2rem;
 }
 
-.lab-difficulty {
+.project-tag {
     margin-left: auto;
     padding: 4px 12px;
     border-radius: 15px;
     font-size: 0.8rem;
     font-weight: 600;
-}
-
-.easy {
-    background: rgba(0, 255, 0, 0.2);
-    color: #00ff00;
-}
-
-.medium {
-    background: rgba(255, 165, 0, 0.2);
-    color: #ffa500;
-}
-
-.hard {
-    background: rgba(255, 0, 0, 0.2);
-    color: #ff0000;
+    background: rgba(0, 102, 255, 0.1);
+    color: var(--secondary-color);
 }
 
 /* About Section */
@@ -724,6 +702,7 @@ section {
         transition: 0.3s;
         box-shadow: 0 10px 27px rgba(0, 0, 0, 0.05);
         padding: 2rem 0;
+        z-index: 1001;
     }
 
     .nav-menu.active {
@@ -759,11 +738,7 @@ section {
         align-items: center;
     }
 
-    .hero-stats {
-        gap: 2rem;
-    }
-
-    .courses-grid {
+    .snippets-grid {
         grid-template-columns: 1fr;
     }
 
@@ -781,6 +756,10 @@ section {
         grid-template-columns: 1fr;
         text-align: center;
     }
+    
+    .social-links {
+        justify-content: center;
+    }
 }
 
 @media (max-width: 480px) {
@@ -792,11 +771,11 @@ section {
         font-size: 2rem;
     }
 
-    .courses-grid {
+    .snippets-grid {
         grid-template-columns: 1fr;
     }
 
-    .labs-container {
+    .projects-container {
         grid-template-columns: 1fr;
     }
 }
