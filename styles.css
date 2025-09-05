@@ -129,38 +129,39 @@ body {
     overflow: hidden;
 }
 
-/* Fixed background animation */
-.hero-background {
+.particles-container {
     position: absolute;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background-image: radial-gradient(circle, rgba(0, 255, 136, 0.1) 2px, transparent 3px),
-                    radial-gradient(circle, rgba(0, 102, 255, 0.1) 2px, transparent 3px),
-                    radial-gradient(circle, rgba(255, 0, 102, 0.1) 2px, transparent 3px);
-    background-size: 50px 50px, 60px 60px, 70px 70px;
-    background-position: 0 0, 25px 25px, 35px 35px;
-    opacity: 0.3;
-    animation: subtleMove 20s linear infinite;
-    z-index: 0;
+    overflow: hidden;
 }
 
-@keyframes subtleMove {
-    0% {
-        transform: translate(0, 0);
+.particles {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: radial-gradient(var(--primary-color) 1px, transparent 1px), 
+                      radial-gradient(var(--secondary-color) 1px, transparent 1px),
+                      radial-gradient(var(--accent-color) 1px, transparent 1px);
+    background-size: 50px 50px, 60px 60px, 70px 70px;
+    background-position: 0 0, 25px 25px, 35px 35px;
+    animation: particles-float 20s linear infinite;
+    opacity: 0.3;
+}
+
+@keyframes particles-float {
+    0% { 
+        transform: translate(0, 0); 
     }
-    25% {
-        transform: translate(-5px, 5px);
+    50% { 
+        transform: translate(-15px, -10px); 
     }
-    50% {
-        transform: translate(5px, 0px);
-    }
-    75% {
-        transform: translate(0px, -5px);
-    }
-    100% {
-        transform: translate(0, 0);
+    100% { 
+        transform: translate(0, 0); 
     }
 }
 
@@ -173,7 +174,7 @@ body {
 
 .hero-title {
     font-family: 'Orbitron', monospace;
-    font-size: 4rem;
+    font-size: 3.5rem;
     font-weight: 900;
     margin-bottom: 1rem;
     background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
@@ -185,7 +186,6 @@ body {
 .typing-text {
     border-right: 2px solid var(--primary-color);
     animation: typing 3s steps(20) infinite;
-    display: inline-block;
 }
 
 .cursor {
@@ -296,14 +296,14 @@ section {
     margin-right: auto;
 }
 
-/* Snippets Section (Formerly Courses) */
+/* Code Snippets Section */
 .snippets {
     background: var(--bg-darker);
 }
 
 .snippets-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
     gap: 2rem;
     margin-top: 3rem;
 }
@@ -317,6 +317,7 @@ section {
     transition: all 0.3s ease;
     position: relative;
     overflow: hidden;
+    height: 100%;
 }
 
 .snippet-card::before {
@@ -367,9 +368,9 @@ section {
     line-height: 1.6;
 }
 
-.snippet-stats {
+.snippet-info {
     display: flex;
-    justify-content: center;
+    justify-content: space-between;
     margin-bottom: 1.5rem;
     font-size: 0.9rem;
     color: var(--text-muted);
@@ -392,32 +393,37 @@ section {
     color: var(--bg-dark);
 }
 
-/* Projects Section (Formerly Labs) */
-.projects-container {
+/* Documentation Section */
+.documentation {
+    background: var(--bg-dark);
+}
+
+.docs-container {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
     gap: 2rem;
     margin-top: 3rem;
 }
 
-.project-category {
+.doc-category {
     background: var(--card-bg);
     border: 1px solid var(--border-color);
     border-radius: 15px;
     padding: 2rem;
+    height: 100%;
 }
 
-.project-category h3 {
+.doc-category h3 {
     color: var(--primary-color);
     margin-bottom: 1.5rem;
     font-size: 1.3rem;
 }
 
-.project-list {
+.doc-list {
     space-y: 1rem;
 }
 
-.project-item {
+.doc-item {
     display: flex;
     align-items: center;
     gap: 1rem;
@@ -429,24 +435,24 @@ section {
     cursor: pointer;
 }
 
-.project-item:hover {
+.doc-item:hover {
     background: rgba(0, 255, 136, 0.1);
     transform: translateX(5px);
 }
 
-.project-item i {
+.doc-item i {
     color: var(--primary-color);
     font-size: 1.2rem;
 }
 
-.project-tag {
+.doc-tag {
     margin-left: auto;
     padding: 4px 12px;
     border-radius: 15px;
     font-size: 0.8rem;
     font-weight: 600;
-    background: rgba(0, 102, 255, 0.1);
-    color: var(--secondary-color);
+    background: rgba(0, 255, 136, 0.2);
+    color: var(--primary-color);
 }
 
 /* About Section */
@@ -702,7 +708,6 @@ section {
         transition: 0.3s;
         box-shadow: 0 10px 27px rgba(0, 0, 0, 0.05);
         padding: 2rem 0;
-        z-index: 1001;
     }
 
     .nav-menu.active {
@@ -738,10 +743,6 @@ section {
         align-items: center;
     }
 
-    .snippets-grid {
-        grid-template-columns: 1fr;
-    }
-
     .about-content {
         grid-template-columns: 1fr;
         gap: 2rem;
@@ -775,7 +776,7 @@ section {
         grid-template-columns: 1fr;
     }
 
-    .projects-container {
+    .docs-container {
         grid-template-columns: 1fr;
     }
 }
