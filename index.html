@@ -10,6 +10,11 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
+    <!-- Milk Tracking Access Button (Floating) -->
+    <button class="milk-track-btn" onclick="openMilkPortal()" title="Milk Traceability System">
+        <i class="fas fa-flask"></i>
+    </button>
+
     <!-- Navigation -->
     <nav class="navbar">
         <div class="nav-container">
@@ -347,6 +352,37 @@
         </div>
     </footer>
 
+    <!-- Login Portal Modal -->
+    <div id="milk-login-modal" class="modal">
+        <div class="modal-content login-container">
+            <span class="close-modal" onclick="closeMilkPortal()">&times;</span>
+            <div class="login-box">
+                <div class="login-header">
+                    <i class="fas fa-flask"></i>
+                    <h2>Milk Traceability System</h2>
+                    <p>Secure Access Portal</p>
+                </div>
+                <form id="milk-login-form" onsubmit="return handleLogin(event)">
+                    <div class="form-group">
+                        <label><i class="fas fa-envelope"></i> Email</label>
+                        <input type="email" id="login-email" placeholder="Enter your email" required>
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-lock"></i> Password</label>
+                        <input type="password" id="login-password" placeholder="Enter your password" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-full">
+                        <i class="fas fa-sign-in-alt"></i> Login to Dashboard
+                    </button>
+                </form>
+                <div class="login-footer">
+                    <p>Demo credentials: <br><code>admin@milktrack.com</code> / <code>admin123</code></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script src="script.js"></script>
+    <script src="milk-track.js"></script>
 </body>
 </html>
