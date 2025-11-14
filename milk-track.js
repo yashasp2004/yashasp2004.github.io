@@ -13,25 +13,54 @@ function closeMilkPortal() {
 }
 
 // Handle login
-function handleLogin(event) {
+async function handleLogin(event) {
     event.preventDefault();
     
     const email = document.getElementById('login-email').value;
     const password = document.getElementById('login-password').value;
     
-    // Simple demo authentication
-    if (email === 'admin@milktrack.com' && password === 'admin123') {
-        // Store login session
-        localStorage.setItem('milktrack_user', JSON.stringify({
-            email: email,
-            name: 'Admin User',
-            loginTime: new Date().toISOString()
-        }));
-        
-        // Redirect to dashboard
-        window.location.href = 'dashboard.html';
+    // Check if Firebase is initialized
+    const useFirebase = typeof firebase !== 'undefined' && 
+                       typeof firebaseConfig !== 'undefined' && 
+                       firebaseConfig.apiKey !== "AIzaSyXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX";
+    
+    if (useFirebase) {
+        // Firebase authentication
+        try {
+            const result = await firebaseLogin(email, password);
+            if (result.success) {
+                // Store login session
+                localStorage.setItem('milktrack_user', JSON.stringify({
+                    email: result.user.email,
+                    name: result.user.displayName || email.split('@')[0],
+                    loginTime: new Date().toISOString(),
+                    uid: result.user.uid
+                }));
+                
+                // Redirect to dashboard
+                window.location.href = 'dashboard.html';
+            } else {
+                alert('Login failed: ' + result.error + '\n\nMake sure you created this account in Firebase Console → Authentication');
+            }
+        } catch (error) {
+            alert('Error: ' + error.message);
+        }
     } else {
-        alert('Invalid credentials! Use:\nEmail: admin@milktrack.com\nPassword: admin123');
+        // Demo mode authentication (fallback when Firebase not configured)
+        if (email === 'admin@milktrack.com' && password === 'admin123') {
+            // Store login session
+            localStorage.setItem('milktrack_user', JSON.stringify({
+                email: email,
+                name: 'Admin User (Demo)',
+                loginTime: new Date().toISOString(),
+                demo: true
+            }));
+            
+            // Redirect to dashboard
+            window.location.href = 'dashboard.html';
+        } else {
+            alert('Invalid credentials!\n\nDemo mode:\nEmail: admin@milktrack.com\nPassword: admin123\n\nOr configure Firebase in firebase-config.js');
+        }
     }
     
     return false;

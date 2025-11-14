@@ -8,6 +8,11 @@
     <link rel="stylesheet" href="dashboard-styles.css">
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
 </head>
 <body class="dashboard-body">
     <!-- Navigation -->
@@ -22,9 +27,6 @@
                 </li>
                 <li class="nav-item">
                     <a href="#live-feed" class="nav-link"><i class="fas fa-rss"></i> Live Feed</a>
-                </li>
-                <li class="nav-item">
-                    <a href="#devices" class="nav-link"><i class="fas fa-microchip"></i> Devices</a>
                 </li>
                 <li class="nav-item">
                     <a href="#farmers" class="nav-link"><i class="fas fa-users"></i> Farmers</a>
@@ -60,7 +62,6 @@
                     <div class="stat-info">
                         <p class="stat-label">Total Milk Today</p>
                         <h3 id="total-milk" class="stat-value">0 L</h3>
-                        <span class="stat-change positive"><i class="fas fa-arrow-up"></i> +12.5%</span>
                     </div>
                 </div>
                 <div class="stat-card">
@@ -68,15 +69,13 @@
                     <div class="stat-info">
                         <p class="stat-label">Active Farmers</p>
                         <h3 id="active-farmers" class="stat-value">0</h3>
-                        <span class="stat-change positive"><i class="fas fa-arrow-up"></i> +3</span>
                     </div>
                 </div>
                 <div class="stat-card">
                     <div class="stat-icon devices"><i class="fas fa-microchip"></i></div>
                     <div class="stat-info">
                         <p class="stat-label">Online Devices</p>
-                        <h3 id="active-devices" class="stat-value">0/4</h3>
-                        <span class="stat-change neutral"><i class="fas fa-circle"></i> All Active</span>
+                        <h3 id="active-devices" class="stat-value">0</h3>
                     </div>
                 </div>
                 <div class="stat-card">
@@ -84,7 +83,6 @@
                     <div class="stat-info">
                         <p class="stat-label">Avg Fat Content</p>
                         <h3 id="avg-fat" class="stat-value">0%</h3>
-                        <span class="stat-change neutral"><i class="fas fa-equals"></i> Standard</span>
                     </div>
                 </div>
             </div>
@@ -191,100 +189,6 @@
             </div>
         </section>
 
-        <!-- Devices Section -->
-        <section id="devices" class="dashboard-section">
-            <h2 class="section-title"><i class="fas fa-microchip"></i> Device Status</h2>
-            <div class="devices-grid">
-                <div class="device-card online">
-                    <div class="device-header">
-                        <h3><i class="fas fa-microchip"></i> Device 001</h3>
-                        <span class="device-status online"><i class="fas fa-circle"></i> Online</span>
-                    </div>
-                    <p class="device-location"><i class="fas fa-map-marker-alt"></i> Main Gate</p>
-                    <div class="device-stats">
-                        <div class="device-stat">
-                            <span>Collections Today:</span>
-                            <strong id="dev1-collections">0</strong>
-                        </div>
-                        <div class="device-stat">
-                            <span>Last Activity:</span>
-                            <strong id="dev1-activity">-</strong>
-                        </div>
-                        <div class="device-stat">
-                            <span>Fingerprints:</span>
-                            <strong id="dev1-fps">0</strong>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="device-card online">
-                    <div class="device-header">
-                        <h3><i class="fas fa-microchip"></i> Device 002</h3>
-                        <span class="device-status online"><i class="fas fa-circle"></i> Online</span>
-                    </div>
-                    <p class="device-location"><i class="fas fa-map-marker-alt"></i> North Collection</p>
-                    <div class="device-stats">
-                        <div class="device-stat">
-                            <span>Collections Today:</span>
-                            <strong id="dev2-collections">0</strong>
-                        </div>
-                        <div class="device-stat">
-                            <span>Last Activity:</span>
-                            <strong id="dev2-activity">-</strong>
-                        </div>
-                        <div class="device-stat">
-                            <span>Fingerprints:</span>
-                            <strong id="dev2-fps">0</strong>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="device-card online">
-                    <div class="device-header">
-                        <h3><i class="fas fa-microchip"></i> Device 003</h3>
-                        <span class="device-status online"><i class="fas fa-circle"></i> Online</span>
-                    </div>
-                    <p class="device-location"><i class="fas fa-map-marker-alt"></i> South Collection</p>
-                    <div class="device-stats">
-                        <div class="device-stat">
-                            <span>Collections Today:</span>
-                            <strong id="dev3-collections">0</strong>
-                        </div>
-                        <div class="device-stat">
-                            <span>Last Activity:</span>
-                            <strong id="dev3-activity">-</strong>
-                        </div>
-                        <div class="device-stat">
-                            <span>Fingerprints:</span>
-                            <strong id="dev3-fps">0</strong>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="device-card online">
-                    <div class="device-header">
-                        <h3><i class="fas fa-microchip"></i> Device 004</h3>
-                        <span class="device-status online"><i class="fas fa-circle"></i> Online</span>
-                    </div>
-                    <p class="device-location"><i class="fas fa-map-marker-alt"></i> Mobile Unit</p>
-                    <div class="device-stats">
-                        <div class="device-stat">
-                            <span>Collections Today:</span>
-                            <strong id="dev4-collections">0</strong>
-                        </div>
-                        <div class="device-stat">
-                            <span>Last Activity:</span>
-                            <strong id="dev4-activity">-</strong>
-                        </div>
-                        <div class="device-stat">
-                            <span>Fingerprints:</span>
-                            <strong id="dev4-fps">0</strong>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
         <!-- Farmers Section -->
         <section id="farmers" class="dashboard-section">
             <h2 class="section-title"><i class="fas fa-users"></i> Registered Farmers</h2>
@@ -344,6 +248,7 @@
     </div>
 
     <script src="script.js"></script>
+    <script src="firebase-config.js"></script>
     <script src="dashboard.js"></script>
 </body>
 </html>

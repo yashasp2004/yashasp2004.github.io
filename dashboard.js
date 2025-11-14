@@ -1,5 +1,13 @@
 // Dashboard JavaScript
 
+// Global variables
+let collectionsData = [];
+let farmersData = {};
+let useFirebase = false;
+let unsubscribeCollections = null;
+let unsubscribeFarmers = null;
+let unsubscribeDevices = null;
+
 // Check authentication
 function checkAuth() {
     const user = localStorage.getItem('milktrack_user');
@@ -11,30 +19,42 @@ function checkAuth() {
 }
 
 // Logout function
-function logout() {
+async function logout() {
     if (confirm('Are you sure you want to logout?')) {
+        // Unsubscribe from Firebase listeners
+        if (unsubscribeCollections) unsubscribeCollections();
+        if (unsubscribeFarmers) unsubscribeFarmers();
+        if (unsubscribeDevices) unsubscribeDevices();
+        
+        // Firebase logout if using Firebase
+        if (useFirebase && typeof firebaseLogout === 'function') {
+            await firebaseLogout();
+        }
+        
         localStorage.removeItem('milktrack_user');
         window.location.href = 'index.html';
     }
 }
 
 // Initialize dashboard
-let collectionsData = [];
-let farmersData = {};
-
 function initDashboard() {
     const user = checkAuth();
     if (user) {
-        document.getElementById('user-name').textContent = user.name;
+        document.getElementById('user-name').textContent = user.name || user.email.split('@')[0];
     }
     
-    // Load existing data from localStorage
-    const savedData = localStorage.getItem('milktrack_collections');
-    if (savedData) {
-        collectionsData = JSON.parse(savedData);
-        updateAllStats();
-        renderFeed();
-        renderFarmers();
+    // Check if Firebase is configured and initialized
+    useFirebase = typeof firebase !== 'undefined' && 
+                  typeof db !== 'undefined' &&
+                  !user.demo;
+    
+    if (useFirebase) {
+        console.log('Using Firebase backend');
+        initFirebaseListeners();
+        loadFirebaseStats();
+    } else {
+        console.log('Using localStorage (demo mode)');
+        initLocalStorage();
     }
     
     // Set up form handler
@@ -55,8 +75,62 @@ function initDashboard() {
     }
 }
 
+// Initialize Firebase real-time listeners
+function initFirebaseListeners() {
+    // Listen to collections
+    if (typeof listenToCollections === 'function') {
+        unsubscribeCollections = listenToCollections((collections) => {
+            collectionsData = collections;
+            renderFeed();
+            updateAllStats();
+            updateDeviceCards([]); // Update devices based on collections
+        });
+    }
+    
+    // Listen to farmers
+    if (typeof listenToFarmers === 'function') {
+        unsubscribeFarmers = listenToFarmers((farmers) => {
+            farmersData = {};
+            farmers.forEach(f => {
+                farmersData[f.id] = f;
+            });
+            renderFarmers();
+        });
+    }
+    
+    // Listen to devices
+    if (typeof listenToDevices === 'function') {
+        unsubscribeDevices = listenToDevices((devices) => {
+            updateDeviceCards(devices);
+        });
+    }
+}
+
+// Load Firebase statistics
+async function loadFirebaseStats() {
+    if (typeof getTodayStats === 'function') {
+        const stats = await getTodayStats();
+        document.getElementById('total-milk').textContent = stats.totalMilk + ' L';
+        document.getElementById('active-farmers').textContent = stats.activeFarmers;
+        document.getElementById('active-devices').textContent = stats.activeDevices;
+        document.getElementById('avg-fat').textContent = stats.avgFat + '%';
+    }
+}
+
+// Initialize localStorage mode
+function initLocalStorage() {
+    // Load existing data from localStorage
+    const savedData = localStorage.getItem('milktrack_collections');
+    if (savedData) {
+        collectionsData = JSON.parse(savedData);
+        updateAllStats();
+        renderFeed();
+        renderFarmers();
+    }
+}
+
 // Handle collection submission
-function handleCollection(event) {
+async function handleCollection(event) {
     event.preventDefault();
     
     const farmerId = document.getElementById('farmer-id').value;
@@ -66,8 +140,6 @@ function handleCollection(event) {
     const deviceId = document.getElementById('device-id').value;
     
     const collection = {
-        id: Date.now(),
-        timestamp: new Date().toISOString(),
         farmerId: farmerId,
         farmerName: farmerName,
         quantity: quantity,
@@ -76,43 +148,235 @@ function handleCollection(event) {
         status: 'Verified'
     };
     
-    // Add to collections
-    collectionsData.unshift(collection);
-    
-    // Update farmer data
-    if (!farmersData[farmerId]) {
-        farmersData[farmerId] = {
-            id: farmerId,
-            name: farmerName,
-            totalDeposits: 0,
-            totalQuantity: 0,
-            lastDeposit: null,
-            fingerprintStatus: 'Registered'
-        };
+    if (useFirebase && typeof addCollection === 'function') {
+        // Firebase mode
+        const result = await addCollection(collection);
+        if (result.success) {
+            showNotification('Collection recorded successfully!', 'success');
+            // Data will update automatically via listeners
+        } else {
+            showNotification('Error: ' + result.error, 'error');
+        }
+    } else {
+        // localStorage mode
+        collection.id = Date.now();
+        collection.timestamp = new Date().toISOString();
+        
+        collectionsData.unshift(collection);
+        
+        // Update farmer data
+        if (!farmersData[farmerId]) {
+            farmersData[farmerId] = {
+                id: farmerId,
+                name: farmerName,
+                totalDeposits: 0,
+                totalQuantity: 0,
+                lastDeposit: null,
+                fingerprintStatus: 'Registered'
+            };
+        }
+        farmersData[farmerId].totalDeposits++;
+        farmersData[farmerId].totalQuantity += quantity;
+        farmersData[farmerId].lastDeposit = new Date().toISOString();
+        
+        // Save to localStorage
+        localStorage.setItem('milktrack_collections', JSON.stringify(collectionsData));
+        localStorage.setItem('milktrack_farmers', JSON.stringify(farmersData));
+        
+        // Update UI
+        updateAllStats();
+        renderFeed();
+        renderFarmers();
+        
+        showNotification('Collection recorded successfully!', 'success');
     }
-    farmersData[farmerId].totalDeposits++;
-    farmersData[farmerId].totalQuantity += quantity;
-    farmersData[farmerId].lastDeposit = new Date().toISOString();
-    
-    // Save to localStorage
-    localStorage.setItem('milktrack_collections', JSON.stringify(collectionsData));
-    localStorage.setItem('milktrack_farmers', JSON.stringify(farmersData));
-    
-    // Update UI
-    updateAllStats();
-    renderFeed();
-    renderFarmers();
     
     // Reset form
     event.target.reset();
     document.getElementById('fat-content').value = '';
+}
+
+// Update device cards from Firebase data
+function updateDeviceCards(devices) {
+    const devicesGrid = document.getElementById('devices-grid');
+    if (!devicesGrid) return;
     
-    // Show success message
-    showNotification('Collection recorded successfully!', 'success');
+    // Get today's collections for stats
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const todayStart = today.getTime();
+    const todayEnd = todayStart + (24 * 60 * 60 * 1000);
+    
+    const todayCollections = collectionsData.filter(c => {
+        if (!c.timestamp && !c.createdAt) return false;
+        
+        // Handle both string timestamps and Firestore Timestamp objects
+        let timestampMs;
+        
+        // Try timestamp field first
+        if (c.timestamp) {
+            if (typeof c.timestamp === 'string') {
+                timestampMs = new Date(c.timestamp).getTime();
+            } else if (c.timestamp.toDate) {
+                // Firestore Timestamp object
+                timestampMs = c.timestamp.toDate().getTime();
+            }
+        }
+        
+        // Fallback to createdAt if timestamp didn't work
+        if (!timestampMs && c.createdAt) {
+            timestampMs = new Date(c.createdAt).getTime();
+        }
+        
+        if (!timestampMs) return false;
+        
+        return timestampMs >= todayStart && timestampMs < todayEnd;
+    });
+    
+    // Get unique devices from today's collections
+    const uniqueDeviceIds = [...new Set(todayCollections.map(c => c.deviceId))];
+    
+    if (uniqueDeviceIds.length === 0) {
+        devicesGrid.innerHTML = `
+            <div class="no-data" style="grid-column: 1/-1; text-align: center; padding: 40px;">
+                <i class="fas fa-info-circle"></i> No active devices. Devices appear here when they send data.
+            </div>
+        `;
+        document.getElementById('active-devices').textContent = '0';
+        return;
+    }
+    
+    // Render devices based on collections
+    devicesGrid.innerHTML = uniqueDeviceIds.map(deviceId => {
+        const deviceCollections = todayCollections.filter(c => c.deviceId === deviceId);
+        const uniqueFarmers = new Set(deviceCollections.map(c => c.farmerId));
+        
+        // Get last activity from collections
+        let lastActivity = 'Never';
+        if (deviceCollections.length > 0) {
+            const latestCollection = deviceCollections[0];
+            let timestamp;
+            
+            if (latestCollection.timestamp) {
+                timestamp = latestCollection.timestamp.toDate ? 
+                    latestCollection.timestamp.toDate() : 
+                    new Date(latestCollection.timestamp);
+            } else if (latestCollection.createdAt) {
+                timestamp = new Date(latestCollection.createdAt);
+            }
+            
+            if (timestamp) {
+                lastActivity = formatTimeAgo(timestamp);
+            }
+        }
+        
+        return `
+            <div class="device-card online">
+                <div class="device-header">
+                    <h3><i class="fas fa-microchip"></i> ${deviceId}</h3>
+                    <span class="device-status online"><i class="fas fa-circle"></i> Online</span>
+                </div>
+                <div class="device-stats">
+                    <div class="device-stat">
+                        <span>Collections Today:</span>
+                        <strong>${deviceCollections.length}</strong>
+                    </div>
+                    <div class="device-stat">
+                        <span>Last Activity:</span>
+                        <strong>${lastActivity}</strong>
+                    </div>
+                    <div class="device-stat">
+                        <span>Unique Farmers:</span>
+                        <strong>${uniqueFarmers.size}</strong>
+                    </div>
+                </div>
+            </div>
+        `;
+    }).join('');
+    
+    // Update active devices count
+    document.getElementById('active-devices').textContent = uniqueDeviceIds.length;
 }
 
 // Update all statistics
 function updateAllStats() {
+    if (useFirebase) {
+        // Firebase mode - stats are updated via listeners
+        loadFirebaseStats();
+        
+        // Also update analytics with current collectionsData
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        const todayStart = today.getTime();
+        const todayEnd = todayStart + (24 * 60 * 60 * 1000);
+        
+        const todayCollections = collectionsData.filter(c => {
+            if (!c.timestamp && !c.createdAt) return false;
+            
+            // Handle both string timestamps and Firestore Timestamp objects
+            let timestampMs;
+            
+            // Try timestamp field first
+            if (c.timestamp) {
+                if (typeof c.timestamp === 'string') {
+                    timestampMs = new Date(c.timestamp).getTime();
+                } else if (c.timestamp.toDate) {
+                    // Firestore Timestamp object
+                    timestampMs = c.timestamp.toDate().getTime();
+                }
+            }
+            
+            // Fallback to createdAt if timestamp didn't work
+            if (!timestampMs && c.createdAt) {
+                timestampMs = new Date(c.createdAt).getTime();
+            }
+            
+            if (!timestampMs) return false;
+            
+            return timestampMs >= todayStart && timestampMs < todayEnd;
+        });
+        
+        if (todayCollections.length > 0) {
+            const totalMilk = todayCollections.reduce((sum, c) => sum + c.quantity, 0);
+            const uniqueFarmers = new Set(todayCollections.map(c => c.farmerId));
+            const avgFat = todayCollections.reduce((sum, c) => sum + c.fatContent, 0) / todayCollections.length;
+            const maxFat = Math.max(...todayCollections.map(c => c.fatContent));
+            const minFat = Math.min(...todayCollections.map(c => c.fatContent));
+            const grade = avgFat >= 4.5 ? 'A+' : avgFat >= 4.0 ? 'A' : avgFat >= 3.5 ? 'B' : 'C';
+            
+            // Update analytics
+            document.getElementById('analytics-total-collections').textContent = todayCollections.length;
+            document.getElementById('analytics-total-milk').textContent = totalMilk.toFixed(1) + ' L';
+            document.getElementById('analytics-avg-per-farmer').textContent = 
+                (uniqueFarmers.size > 0 ? (totalMilk / uniqueFarmers.size).toFixed(1) : 0) + ' L';
+            document.getElementById('analytics-avg-fat').textContent = avgFat.toFixed(1) + '%';
+            document.getElementById('analytics-max-fat').textContent = maxFat.toFixed(1) + '%';
+            document.getElementById('analytics-min-fat').textContent = minFat.toFixed(1) + '%';
+            document.getElementById('analytics-grade').textContent = grade;
+            
+            // Peak time
+            const hours = todayCollections.map(c => {
+                let timestamp;
+                if (c.timestamp) {
+                    timestamp = c.timestamp.toDate ? c.timestamp.toDate() : new Date(c.timestamp);
+                } else if (c.createdAt) {
+                    timestamp = new Date(c.createdAt);
+                }
+                return timestamp ? timestamp.getHours() : 0;
+            });
+            const peakHour = hours.sort((a,b) =>
+                hours.filter(h => h === a).length - hours.filter(h => h === b).length
+            ).pop();
+            document.getElementById('analytics-peak-time').textContent = peakHour + ':00';
+            
+            // Top performers
+            updateTopPerformers(todayCollections);
+        }
+        
+        return;
+    }
+    
+    // localStorage mode
     const today = new Date().toISOString().split('T')[0];
     const todayCollections = collectionsData.filter(c => 
         c.timestamp.startsWith(today)
@@ -153,6 +417,11 @@ function updateAllStats() {
             // Quality grade
             const grade = avgFat >= 4.5 ? 'A+' : avgFat >= 4.0 ? 'A' : avgFat >= 3.5 ? 'B' : 'C';
             document.getElementById('analytics-grade').textContent = grade;
+        } else {
+            document.getElementById('analytics-max-fat').textContent = '0%';
+            document.getElementById('analytics-min-fat').textContent = '0%';
+            document.getElementById('analytics-grade').textContent = '-';
+            document.getElementById('analytics-peak-time').textContent = '-';
         }
         
         // Peak collection time
@@ -163,27 +432,56 @@ function updateAllStats() {
             ).pop();
             document.getElementById('analytics-peak-time').textContent = peakHour + ':00';
         }
+        
+        // Update Top Performers
+        updateTopPerformers(todayCollections);
     }
     
-    // Update device stats
-    for (let i = 1; i <= 4; i++) {
-        const devId = `DEV00${i}`;
-        const devCollections = todayCollections.filter(c => c.deviceId === devId);
-        const devElement = document.getElementById(`dev${i}-collections`);
-        const devActivity = document.getElementById(`dev${i}-activity`);
-        const devFps = document.getElementById(`dev${i}-fps`);
+    // Update device stats in localStorage mode
+    const devicesGrid = document.getElementById('devices-grid');
+    if (devicesGrid) {
+        // Get unique devices from collections
+        const uniqueDevices = [...new Set(todayCollections.map(c => c.deviceId))];
         
-        if (devElement) {
-            devElement.textContent = devCollections.length;
+        if (uniqueDevices.length === 0) {
+            devicesGrid.innerHTML = `
+                <div class="no-data" style="grid-column: 1/-1; text-align: center; padding: 40px;">
+                    <i class="fas fa-info-circle"></i> No active devices. Devices appear here when they send data.
+                </div>
+            `;
+        } else {
+            devicesGrid.innerHTML = uniqueDevices.map(deviceId => {
+                const devCollections = todayCollections.filter(c => c.deviceId === deviceId);
+                const uniqueFarmersForDevice = new Set(devCollections.map(c => c.farmerId));
+                const lastActivity = devCollections.length > 0 ? formatTimeAgo(new Date(devCollections[0].timestamp)) : 'Never';
+                
+                return `
+                    <div class="device-card online">
+                        <div class="device-header">
+                            <h3><i class="fas fa-microchip"></i> ${deviceId}</h3>
+                            <span class="device-status online"><i class="fas fa-circle"></i> Online</span>
+                        </div>
+                        <div class="device-stats">
+                            <div class="device-stat">
+                                <span>Collections Today:</span>
+                                <strong>${devCollections.length}</strong>
+                            </div>
+                            <div class="device-stat">
+                                <span>Last Activity:</span>
+                                <strong>${lastActivity}</strong>
+                            </div>
+                            <div class="device-stat">
+                                <span>Unique Farmers:</span>
+                                <strong>${uniqueFarmersForDevice.size}</strong>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
         }
-        if (devActivity && devCollections.length > 0) {
-            const lastTime = new Date(devCollections[0].timestamp);
-            devActivity.textContent = formatTimeAgo(lastTime);
-        }
-        if (devFps) {
-            const uniqueFarmersForDevice = new Set(devCollections.map(c => c.farmerId));
-            devFps.textContent = uniqueFarmersForDevice.size;
-        }
+        
+        // Update active devices count
+        document.getElementById('active-devices').textContent = uniqueDevices.length;
     }
 }
 
@@ -244,6 +542,53 @@ function renderFarmers() {
     `).join('');
 }
 
+// Update Top Performers section
+function updateTopPerformers(todayCollections) {
+    const topPerformersEl = document.getElementById('top-performers');
+    if (!topPerformersEl) return;
+    
+    if (todayCollections.length === 0) {
+        topPerformersEl.innerHTML = '<p class="muted"><i class="fas fa-trophy"></i> No data available yet</p>';
+        return;
+    }
+    
+    // Calculate farmer totals
+    const farmerTotals = {};
+    todayCollections.forEach(c => {
+        if (!farmerTotals[c.farmerId]) {
+            farmerTotals[c.farmerId] = {
+                name: c.farmerName,
+                totalQuantity: 0,
+                collections: 0
+            };
+        }
+        farmerTotals[c.farmerId].totalQuantity += c.quantity;
+        farmerTotals[c.farmerId].collections += 1;
+    });
+    
+    // Sort by total quantity and get top 3
+    const topFarmers = Object.entries(farmerTotals)
+        .map(([id, data]) => ({ id, ...data }))
+        .sort((a, b) => b.totalQuantity - a.totalQuantity)
+        .slice(0, 3);
+    
+    // Render top performers
+    const medals = ['🥇', '🥈', '🥉'];
+    topPerformersEl.innerHTML = topFarmers.map((farmer, index) => `
+        <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid #eee;">
+            <div>
+                <span style="font-size: 20px; margin-right: 8px;">${medals[index]}</span>
+                <strong>${farmer.name}</strong>
+                <span style="color: #666; font-size: 12px; margin-left: 8px;">${farmer.id}</span>
+            </div>
+            <div style="text-align: right;">
+                <strong style="color: #667eea;">${farmer.totalQuantity.toFixed(1)} L</strong>
+                <div style="font-size: 11px; color: #999;">${farmer.collections} collection${farmer.collections > 1 ? 's' : ''}</div>
+            </div>
+        </div>
+    `).join('');
+}
+
 // Utility functions
 function formatDateTime(isoString) {
     if (!isoString) return '-';
@@ -286,42 +631,63 @@ function showNotification(message, type = 'info') {
 }
 
 // Clear feed function
-function clearFeed() {
-    if (confirm('Are you sure you want to clear all collections? This cannot be undone.')) {
-        collectionsData = [];
-        farmersData = {};
-        localStorage.removeItem('milktrack_collections');
-        localStorage.removeItem('milktrack_farmers');
-        updateAllStats();
-        renderFeed();
-        renderFarmers();
-        showNotification('All data cleared', 'info');
+async function clearFeed() {
+    if (useFirebase && typeof clearAllCollections === 'function') {
+        // Firebase mode
+        const confirmed = await clearAllCollections();
+        if (confirmed) {
+            showNotification('All data cleared from Firebase', 'info');
+        }
+    } else {
+        // localStorage mode
+        if (confirm('Are you sure you want to clear all collections? This cannot be undone.')) {
+            collectionsData = [];
+            farmersData = {};
+            localStorage.removeItem('milktrack_collections');
+            localStorage.removeItem('milktrack_farmers');
+            updateAllStats();
+            renderFeed();
+            renderFarmers();
+            showNotification('All data cleared', 'info');
+        }
     }
 }
 
 // Refresh feed
 function refreshFeed() {
-    updateAllStats();
-    renderFeed();
-    renderFarmers();
-    showNotification('Data refreshed', 'success');
+    if (useFirebase) {
+        loadFirebaseStats();
+        showNotification('Data refreshed from Firebase', 'success');
+    } else {
+        updateAllStats();
+        renderFeed();
+        renderFarmers();
+        showNotification('Data refreshed', 'success');
+    }
 }
 
 // Export data to CSV
-function exportData() {
-    if (collectionsData.length === 0) {
+async function exportData() {
+    let dataToExport = collectionsData;
+    
+    if (useFirebase && typeof exportCollectionsToCSV === 'function') {
+        // Firebase mode - fetch all data
+        dataToExport = await exportCollectionsToCSV();
+    }
+    
+    if (dataToExport.length === 0) {
         alert('No data to export');
         return;
     }
     
     const csv = [
         ['Timestamp', 'Farmer ID', 'Farmer Name', 'Quantity (L)', 'Fat %', 'Device ID', 'Status'],
-        ...collectionsData.map(c => [
+        ...dataToExport.map(c => [
             c.timestamp,
             c.farmerId,
             c.farmerName,
             c.quantity,
-            c.fatContent,
+            c.fatContent || c.fatPercent,
             c.deviceId,
             c.status
         ])

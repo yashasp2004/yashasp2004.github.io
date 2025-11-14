@@ -1,0 +1,398 @@
+# CIRCUIT DIAGRAM - MILK TRACEABILITY IOT DEVICE
+
+```
+================================================================================
+                    MILK TRACEABILITY SYSTEM - CIRCUIT DIAGRAM
+================================================================================
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                          POWER SUPPLY SECTION                                │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+    5V/3A Adapter
+        │
+        ├──────► [1000µF Cap] ──► GND
+        │
+        ├──────► ESP32 VIN (5V)
+        │
+        ├──────► ADS1115 VDD (5V)
+        │
+        ├──────► R307 Fingerprint VCC (5V or 3.3V - check your module)
+        │
+        ├──────► Relay Module VCC (5V)
+        │
+        ├──────► XR2206 Signal Generator VCC (5V)
+        │
+        └──────► OLED Display VCC (3.3V or 5V)
+
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                         ESP32 PIN CONNECTIONS                                │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+    ESP32 DevKit V1 (30-pin)
+    
+    ┌─────────────────────────────────────────────────────────────┐
+    │                                                               │
+    │  3V3  ────────────────────────────► Common 3.3V Rail         │
+    │  GND  ────────────────────────────► Common Ground            │
+    │  VIN  ◄───────────────────────────  5V Input                 │
+    │                                                               │
+    │  GPIO21 (SDA)  ─────────┬─────────► ADS1115 SDA             │
+    │                         └─────────► OLED Display SDA         │
+    │                                                               │
+    │  GPIO22 (SCL)  ─────────┬─────────► ADS1115 SCL             │
+    │                         └─────────► OLED Display SCL         │
+    │                                                               │
+    │  GPIO16 (RX2)  ────────────────────► R307 TX (Yellow)        │
+    │  GPIO17 (TX2)  ────────────────────► R307 RX (White)         │
+    │                                                               │
+    │  GPIO2   ──────────[220Ω]─────────► Blue LED (Power)         │
+    │  GPIO4   ──────────[220Ω]─────────► Green LED (Success)      │
+    │  GPIO5   ──────────[220Ω]─────────► Red LED (Error)          │
+    │                                                               │
+    │  GPIO18  ───────────────────────────► Relay IN (Valve)       │
+    │  GPIO19  ───────────────────────────► Buzzer (+)             │
+    │                                                               │
+    │  GPIO32  ───────────────────────────► Button 1 (Enter)       │
+    │  GPIO33  ───────────────────────────► Button 2 (Cancel)      │
+    │                                                               │
+    │  GPIO25 (DAC1) ─────────────────────► AC Signal Gen (opt)    │
+    │  GPIO26 (DAC2) ─────────────────────► Reserved               │
+    │                                                               │
+    └───────────────────────────────────────────────────────────────┘
+
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                      ADS1115 ADC MODULE (16-bit)                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+    ADS1115 Module
+    ┌──────────────────────────────────────────────┐
+    │                                                │
+    │  VDD  ◄────────────────────  5V               │
+    │  GND  ◄────────────────────  GND              │
+    │  SCL  ◄────────────────────  ESP32 GPIO22     │
+    │  SDA  ◄────────────────────  ESP32 GPIO21     │
+    │  ADDR ◄────────────────────  GND (Address 0x48)│
+    │                                                │
+    │  A0   ◄────────────────────  Conductivity Signal (from divider) │
+    │  A1   ◄────────────────────  Reserved         │
+    │  A2   ◄────────────────────  Reserved         │
+    │  A3   ◄────────────────────  Reserved         │
+    │                                                │
+    └────────────────────────────────────────────────┘
+
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                    CONDUCTIVITY SENSOR (4-ROD SYSTEM)                        │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+    ESP32 DAC + LM358 Op-Amp (1kHz AC Signal Generator)
+    
+    ESP32 GPIO25 (DAC1)
+         │
+         │  ~1kHz sine wave (0-3.3V DC)
+         │
+         ├─────[1µF]─────┬──────[10kΩ]──────┐
+         │                │                   │
+         │               GND             ┌────┴────┐
+         │                               │         │
+         │                          ┌────┤+  LM358 │
+         │                          │    │   Op1   ├─────► Rod 1 (Excitation+)
+         │                    GND───┤-   │         │
+         │                          │    └─────────┘
+         │                          │
+         │                      [10kΩ]  (Unity gain buffer)
+         │                          │
+         │                         GND
+         │
+    (DAC output is AC coupled and buffered for driving conductivity rods)
+
+    MILK CONTAINER (4 Stainless Steel Rods - 316L)
+    
+         Rod1    Rod2    Rod3    Rod4
+          │       │       │       │
+          │       │       │       │
+      ═══╪═══════╪═══════╪═══════╪═══  ← Milk Level
+          │       │       │       │
+          │       │       │       │
+         (+)     (S)     (S)     (-)
+    
+    Rod 1: AC Excitation (+) from LM358 Op-Amp Buffer
+    Rod 2: Voltage Sense (+) → INA128 V+
+    Rod 3: Voltage Sense (-) → INA128 V-
+    Rod 4: Ground/Current Return (-) to GND
+    
+    
+    ┌─────────────────────────────────────────────────────────────────┐
+    │         INSTRUMENTATION AMPLIFIER CONFIGURATION (INA128)         │
+    └─────────────────────────────────────────────────────────────────┘
+    
+    4-Electrode Kelvin Sensing Configuration:
+    
+    Rod 1 (AC+) ──────┬──── Current Path ────┬──── Rod 4 (GND)
+                      │                       │
+                   [Zmilk]               [Zmilk]
+                      │                       │
+    Rod 2 (V+) ───────┴───────────────────────┴──── Rod 3 (V-)
+         │                                              │
+         │  High Impedance (>10GΩ)                     │
+         │                                              │
+         └────────► INA128 Pin 3 (V+)                  │
+                                                        │
+                    INA128 Pin 2 (V-) ◄────────────────┘
+    
+    
+    Instrumentation Amplifier Circuit:
+    
+    Rod 2 ───────────────────► INA128 Pin 3 (V+ Input)
+                               
+    Rod 3 ───────────────────► INA128 Pin 2 (V- Input)
+    
+    INA128 Pin 5 (Rg) ────┬──── [1kΩ Gain Resistor] ────┬──── INA128 Pin 4 (Rg)
+                          │                               │
+                      Optional: Adjust gain (G = 1 + 50kΩ/Rg)
+    
+    INA128 Pin 6 (Vout) ──┬──── [RC Filter] ──── ADS1115 A0
+                          │
+                      [100nF]  (Low-pass filter for 1kHz)
+                          │
+                         GND
+    
+    INA128 Pin 7 (V+) ◄──── 5V Supply
+    INA128 Pin 8 (Ref) ──── 2.5V Reference (Voltage Divider)
+    INA128 Pin 1 (V-) ──── GND
+    
+    
+    Reference Voltage (for single-supply operation):
+    
+    5V ────┬──── [10kΩ] ────┬──── INA128 Pin 8 (Ref = 2.5V)
+           │                 │
+       [100µF]           [10kΩ]
+           │                 │
+          GND               GND
+    
+    
+    Benefits of Instrumentation Amplifier:
+    - High input impedance (>10GΩ) - no loading of sense electrodes
+    - Differential measurement eliminates common-mode noise
+    - Adjustable gain for better ADC resolution
+    - Rejects ground potential differences
+    - True 4-electrode Kelvin sensing
+    
+    This configuration measures the voltage drop across the milk
+    between Rod 2 and Rod 3, while current flows between Rod 1 and Rod 4.
+    The high input impedance ensures accurate voltage measurement without
+    drawing current through the sense electrodes.
+
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                    R307 FINGERPRINT SENSOR MODULE                            │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+    R307 Sensor (6 wires)
+    ┌─────────────────────────────────────────┐
+    │                                           │
+    │  RED    ◄──────────  5V (or 3.3V)       │
+    │  BLACK  ◄──────────  GND                │
+    │  YELLOW ◄──────────  ESP32 GPIO16 (RX2) │
+    │  WHITE  ◄──────────  ESP32 GPIO17 (TX2) │
+    │  BLUE   ◄──────────  NC (Not Connected) │
+    │  GREEN  ◄──────────  NC (Not Connected) │
+    │                                           │
+    └───────────────────────────────────────────┘
+    
+    Note: Check your module - some use 3.3V, others 5V
+    If 5V module with 3.3V ESP32 UART:
+    - Use voltage divider on WHITE wire (TX from sensor to ESP32 RX)
+    - YELLOW can directly connect (ESP32 TX to sensor RX)
+
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                      I2C OLED DISPLAY (Optional)                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+    0.96" OLED Display (I2C)
+    ┌──────────────────────────────────┐
+    │  VCC  ◄───────  3.3V or 5V      │
+    │  GND  ◄───────  GND             │
+    │  SCL  ◄───────  ESP32 GPIO22    │
+    │  SDA  ◄───────  ESP32 GPIO21    │
+    └──────────────────────────────────┘
+    
+    (Shares I2C bus with ADS1115)
+
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                        LED INDICATORS & BUZZER                               │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+    Blue LED (Power Indicator)
+    ESP32 GPIO2 ────[220Ω]────►|─── GND
+                              LED
+    
+    Green LED (Success/Ready)
+    ESP32 GPIO4 ────[220Ω]────►|─── GND
+                              LED
+    
+    Red LED (Error/Busy)
+    ESP32 GPIO5 ────[220Ω]────►|─── GND
+                              LED
+    
+    Buzzer (Active 5V)
+    ESP32 GPIO19 ────► Buzzer (+)
+                       Buzzer (-) ────► GND
+
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                     RELAY MODULE (Optional - Milk Valve)                     │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+    5V Relay Module
+    ┌────────────────────────────────────┐
+    │  VCC  ◄───────  5V                │
+    │  GND  ◄───────  GND               │
+    │  IN   ◄───────  ESP32 GPIO18      │
+    │                                    │
+    │  COM  ────┐                        │
+    │  NO   ────┤  To Solenoid Valve    │
+    │  NC   ────┘  (12V DC)             │
+    └────────────────────────────────────┘
+
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                          PUSH BUTTONS                                        │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+    Button 1 (Enter/Confirm)
+    ESP32 GPIO32 ────┬────[10kΩ]──── 3.3V
+                     │
+                     └──── Button ──── GND
+    
+    Button 2 (Cancel/Back)
+    ESP32 GPIO33 ────┬────[10kΩ]──── 3.3V
+                     │
+                     └──── Button ──── GND
+    
+    (Internal pull-up can also be used in code)
+
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                     COMPLETE SYSTEM BLOCK DIAGRAM                            │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+    ┌──────────────┐
+    │   5V Power   │
+    │   Supply     │
+    └──────┬───────┘
+           │
+           ├─────────────────────────────────────────────────┐
+           │                                                  │
+           ▼                                                  ▼
+    ┌──────────────┐                                  ┌──────────────┐
+    │    ESP32     │◄──────── WiFi ──────────────────►│   Cloud/     │
+    │  (Main MCU)  │         Connection               │   Server     │
+    └──────┬───────┘                                  └──────────────┘
+           │
+           ├──► I2C ──────┬──────► ADS1115 ◄──── Conductivity Rods
+           │              │                      (Fat Sensor)
+           │              └──────► OLED Display
+           │
+           ├──► UART ────────────► R307 Fingerprint Sensor
+           │
+           ├──► GPIO ────────────► LEDs (Status Indicators)
+           │
+           ├──► GPIO ────────────► Buzzer (Audio Feedback)
+           │
+           ├──► GPIO ────────────► Buttons (User Input)
+           │
+           └──► GPIO ────────────► Relay (Valve Control)
+
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                        PCB LAYOUT RECOMMENDATION                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+    Top View of Enclosure:
+    
+    ┌─────────────────────────────────────────────────┐
+    │                                                   │
+    │  [OLED Display]          [Fingerprint Sensor]   │
+    │                                                   │
+    │  ●LED ●LED ●LED                                  │
+    │  PWR  OK  ERR          [Enter] [Cancel]         │
+    │                         Button  Button           │
+    │                                                   │
+    │  ┌───────────────────────────────────┐          │
+    │  │        ESP32 DevKit               │          │
+    │  │                                    │          │
+    │  │  ┌──────┐  ┌──────┐  ┌──────┐   │          │
+    │  │  │ADS115│  │Relay │  │XR2206│   │          │
+    │  │  └──────┘  └──────┘  └──────┘   │          │
+    │  └───────────────────────────────────┘          │
+    │                                                   │
+    │  Terminal Blocks:                                │
+    │  [Rod1] [Rod2] [Rod3] [Rod4] [5V] [GND]        │
+    │                                                   │
+    └───────────────────────────────────────────────────┘
+
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                      WATERPROOFING & INSTALLATION                            │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+    Milk Container Installation:
+    
+    ┌────────────────────────────────────┐
+    │                                     │  ← Lid
+    │   Milk Collection Container         │
+    │                                     │
+    │     Rod1  Rod2  Rod3  Rod4         │
+    │      │     │     │     │           │
+    │      │     │     │     │           │
+    │  ════╪═════╪═════╪═════╪═════      │  ← Milk Level
+    │      │     │     │     │           │
+    │      │     │     │     │           │
+    │      │     │     │     │           │
+    └──────┼─────┼─────┼─────┼───────────┘
+           │     │     │     │
+           └─────┴─────┴─────┴──── Waterproof Cable Gland
+                                     to Electronics Box
+    
+    Electronics Box (Mounted on wall nearby):
+    - IP65 rated enclosure
+    - All electronics inside
+    - Display and fingerprint sensor on front panel
+    - Cables to milk rods through waterproof glands
+
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                           IMPORTANT NOTES                                    │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+1. ⚠️ SAFETY FIRST:
+   - Use ONLY food-grade 316L stainless steel rods
+   - AC voltage should be LOW (<5V AC peak-to-peak)
+   - Keep electronics DRY and away from milk
+   - Proper grounding to prevent shock
+
+2. I2C Addressing:
+   - ADS1115: 0x48 (ADDR pin to GND)
+   - OLED: 0x3C or 0x3D (check your module)
+
+3. Power Consumption:
+   - Typical: 200-300mA
+   - Peak (WiFi transmitting): 500-800mA
+   - Ensure 2A+ power supply
+
+4. Rod Spacing:
+   - 20-30mm apart for optimal measurement
+   - Submerge at least 100mm in milk
+
+5. Calibration:
+   - Test with known fat% milk samples
+   - Create lookup table in firmware
+   - Regular recalibration recommended
+
+================================================================================
