@@ -449,6 +449,8 @@
 /* Table */
 .table-container {
     overflow-x: auto;
+    max-height: 500px;
+    overflow-y: auto;
 }
 
 .feed-table {
@@ -458,6 +460,9 @@
 
 .feed-table thead {
     background: rgba(0, 255, 136, 0.05);
+    position: sticky;
+    top: 0;
+    z-index: 10;
 }
 
 .feed-table th {
@@ -467,6 +472,7 @@
     font-weight: 600;
     font-size: 0.9rem;
     border-bottom: 2px solid var(--border-color);
+    background: rgba(0, 255, 136, 0.05);
 }
 
 .feed-table th i {
@@ -645,6 +651,8 @@
 
 .farmers-table-container {
     overflow-x: auto;
+    max-height: 500px;
+    overflow-y: auto;
 }
 
 .farmers-table {
@@ -654,6 +662,9 @@
 
 .farmers-table thead {
     background: rgba(0, 255, 136, 0.05);
+    position: sticky;
+    top: 0;
+    z-index: 10;
 }
 
 .farmers-table th {
@@ -663,6 +674,7 @@
     font-weight: 600;
     font-size: 0.9rem;
     border-bottom: 2px solid var(--border-color);
+    background: rgba(0, 255, 136, 0.05);
 }
 
 .farmers-table td {

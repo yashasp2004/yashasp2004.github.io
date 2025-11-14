@@ -7,6 +7,8 @@ let useFirebase = false;
 let unsubscribeCollections = null;
 let unsubscribeFarmers = null;
 let unsubscribeDevices = null;
+let trendChart = null;
+let qualityChart = null;
 
 // Check authentication
 function checkAuth() {
@@ -84,6 +86,8 @@ function initFirebaseListeners() {
             renderFeed();
             updateAllStats();
             updateDeviceCards([]); // Update devices based on collections
+            updateTrendChart();
+            updateQualityChart();
         });
     }
     
@@ -126,6 +130,8 @@ function initLocalStorage() {
         updateAllStats();
         renderFeed();
         renderFarmers();
+        updateTrendChart();
+        updateQualityChart();
     }
 }
 
@@ -187,6 +193,8 @@ async function handleCollection(event) {
         updateAllStats();
         renderFeed();
         renderFarmers();
+        updateTrendChart();
+        updateQualityChart();
         
         showNotification('Collection recorded successfully!', 'success');
     }
@@ -304,74 +312,8 @@ function updateAllStats() {
         // Firebase mode - stats are updated via listeners
         loadFirebaseStats();
         
-        // Also update analytics with current collectionsData
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
-        const todayStart = today.getTime();
-        const todayEnd = todayStart + (24 * 60 * 60 * 1000);
-        
-        const todayCollections = collectionsData.filter(c => {
-            if (!c.timestamp && !c.createdAt) return false;
-            
-            // Handle both string timestamps and Firestore Timestamp objects
-            let timestampMs;
-            
-            // Try timestamp field first
-            if (c.timestamp) {
-                if (typeof c.timestamp === 'string') {
-                    timestampMs = new Date(c.timestamp).getTime();
-                } else if (c.timestamp.toDate) {
-                    // Firestore Timestamp object
-                    timestampMs = c.timestamp.toDate().getTime();
-                }
-            }
-            
-            // Fallback to createdAt if timestamp didn't work
-            if (!timestampMs && c.createdAt) {
-                timestampMs = new Date(c.createdAt).getTime();
-            }
-            
-            if (!timestampMs) return false;
-            
-            return timestampMs >= todayStart && timestampMs < todayEnd;
-        });
-        
-        if (todayCollections.length > 0) {
-            const totalMilk = todayCollections.reduce((sum, c) => sum + c.quantity, 0);
-            const uniqueFarmers = new Set(todayCollections.map(c => c.farmerId));
-            const avgFat = todayCollections.reduce((sum, c) => sum + c.fatContent, 0) / todayCollections.length;
-            const maxFat = Math.max(...todayCollections.map(c => c.fatContent));
-            const minFat = Math.min(...todayCollections.map(c => c.fatContent));
-            const grade = avgFat >= 4.5 ? 'A+' : avgFat >= 4.0 ? 'A' : avgFat >= 3.5 ? 'B' : 'C';
-            
-            // Update analytics
-            document.getElementById('analytics-total-collections').textContent = todayCollections.length;
-            document.getElementById('analytics-total-milk').textContent = totalMilk.toFixed(1) + ' L';
-            document.getElementById('analytics-avg-per-farmer').textContent = 
-                (uniqueFarmers.size > 0 ? (totalMilk / uniqueFarmers.size).toFixed(1) : 0) + ' L';
-            document.getElementById('analytics-avg-fat').textContent = avgFat.toFixed(1) + '%';
-            document.getElementById('analytics-max-fat').textContent = maxFat.toFixed(1) + '%';
-            document.getElementById('analytics-min-fat').textContent = minFat.toFixed(1) + '%';
-            document.getElementById('analytics-grade').textContent = grade;
-            
-            // Peak time
-            const hours = todayCollections.map(c => {
-                let timestamp;
-                if (c.timestamp) {
-                    timestamp = c.timestamp.toDate ? c.timestamp.toDate() : new Date(c.timestamp);
-                } else if (c.createdAt) {
-                    timestamp = new Date(c.createdAt);
-                }
-                return timestamp ? timestamp.getHours() : 0;
-            });
-            const peakHour = hours.sort((a,b) =>
-                hours.filter(h => h === a).length - hours.filter(h => h === b).length
-            ).pop();
-            document.getElementById('analytics-peak-time').textContent = peakHour + ':00';
-            
-            // Top performers
-            updateTopPerformers(todayCollections);
-        }
+        // Also update analytics and charts with current collectionsData
+        updateAnalyticsSection();
         
         return;
     }
@@ -400,42 +342,8 @@ function updateAllStats() {
         : 0;
     document.getElementById('avg-fat').textContent = avgFat.toFixed(1) + '%';
     
-    // Update analytics
-    if (document.getElementById('analytics-total-collections')) {
-        document.getElementById('analytics-total-collections').textContent = todayCollections.length;
-        document.getElementById('analytics-total-milk').textContent = totalMilk.toFixed(1) + ' L';
-        document.getElementById('analytics-avg-per-farmer').textContent = 
-            (uniqueFarmers.size > 0 ? (totalMilk / uniqueFarmers.size).toFixed(1) : 0) + ' L';
-        document.getElementById('analytics-avg-fat').textContent = avgFat.toFixed(1) + '%';
-        
-        if (todayCollections.length > 0) {
-            const maxFat = Math.max(...todayCollections.map(c => c.fatContent));
-            const minFat = Math.min(...todayCollections.map(c => c.fatContent));
-            document.getElementById('analytics-max-fat').textContent = maxFat.toFixed(1) + '%';
-            document.getElementById('analytics-min-fat').textContent = minFat.toFixed(1) + '%';
-            
-            // Quality grade
-            const grade = avgFat >= 4.5 ? 'A+' : avgFat >= 4.0 ? 'A' : avgFat >= 3.5 ? 'B' : 'C';
-            document.getElementById('analytics-grade').textContent = grade;
-        } else {
-            document.getElementById('analytics-max-fat').textContent = '0%';
-            document.getElementById('analytics-min-fat').textContent = '0%';
-            document.getElementById('analytics-grade').textContent = '-';
-            document.getElementById('analytics-peak-time').textContent = '-';
-        }
-        
-        // Peak collection time
-        if (todayCollections.length > 0) {
-            const hours = todayCollections.map(c => new Date(c.timestamp).getHours());
-            const peakHour = hours.sort((a,b) =>
-                hours.filter(h => h === a).length - hours.filter(h => h === b).length
-            ).pop();
-            document.getElementById('analytics-peak-time').textContent = peakHour + ':00';
-        }
-        
-        // Update Top Performers
-        updateTopPerformers(todayCollections);
-    }
+    // Update analytics section
+    updateAnalyticsSection();
     
     // Update device stats in localStorage mode
     const devicesGrid = document.getElementById('devices-grid');
@@ -482,6 +390,92 @@ function updateAllStats() {
         
         // Update active devices count
         document.getElementById('active-devices').textContent = uniqueDevices.length;
+    }
+}
+
+// Update analytics section (works for both Firebase and localStorage)
+function updateAnalyticsSection() {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const todayStart = today.getTime();
+    const todayEnd = todayStart + (24 * 60 * 60 * 1000);
+    
+    const todayCollections = collectionsData.filter(c => {
+        if (!c.timestamp && !c.createdAt) return false;
+        
+        // Handle both string timestamps and Firestore Timestamp objects
+        let timestampMs;
+        
+        // Try timestamp field first
+        if (c.timestamp) {
+            if (typeof c.timestamp === 'string') {
+                timestampMs = new Date(c.timestamp).getTime();
+            } else if (c.timestamp.toDate) {
+                // Firestore Timestamp object
+                timestampMs = c.timestamp.toDate().getTime();
+            }
+        }
+        
+        // Fallback to createdAt if timestamp didn't work
+        if (!timestampMs && c.createdAt) {
+            timestampMs = new Date(c.createdAt).getTime();
+        }
+        
+        if (!timestampMs) return false;
+        
+        return timestampMs >= todayStart && timestampMs < todayEnd;
+    });
+    
+    if (todayCollections.length > 0) {
+        const totalMilk = todayCollections.reduce((sum, c) => sum + c.quantity, 0);
+        const uniqueFarmers = new Set(todayCollections.map(c => c.farmerId));
+        const avgFat = todayCollections.reduce((sum, c) => sum + c.fatContent, 0) / todayCollections.length;
+        const maxFat = Math.max(...todayCollections.map(c => c.fatContent));
+        const minFat = Math.min(...todayCollections.map(c => c.fatContent));
+        const grade = avgFat >= 4.5 ? 'A+' : avgFat >= 4.0 ? 'A' : avgFat >= 3.5 ? 'B' : 'C';
+        
+        // Update analytics
+        document.getElementById('analytics-total-collections').textContent = todayCollections.length;
+        document.getElementById('analytics-total-milk').textContent = totalMilk.toFixed(1) + ' L';
+        document.getElementById('analytics-avg-per-farmer').textContent = 
+            (uniqueFarmers.size > 0 ? (totalMilk / uniqueFarmers.size).toFixed(1) : 0) + ' L';
+        document.getElementById('analytics-avg-fat').textContent = avgFat.toFixed(1) + '%';
+        document.getElementById('analytics-max-fat').textContent = maxFat.toFixed(1) + '%';
+        document.getElementById('analytics-min-fat').textContent = minFat.toFixed(1) + '%';
+        document.getElementById('analytics-grade').textContent = grade;
+        
+        // Peak time
+        const hours = todayCollections.map(c => {
+            let timestamp;
+            if (c.timestamp) {
+                timestamp = c.timestamp.toDate ? c.timestamp.toDate() : new Date(c.timestamp);
+            } else if (c.createdAt) {
+                timestamp = new Date(c.createdAt);
+            }
+            return timestamp ? timestamp.getHours() : 0;
+        });
+        const peakHour = hours.sort((a,b) =>
+            hours.filter(h => h === a).length - hours.filter(h => h === b).length
+        ).pop();
+        document.getElementById('analytics-peak-time').textContent = peakHour + ':00';
+        
+        // Top performers
+        updateTopPerformers(todayCollections);
+    } else {
+        // No data today - show zeros
+        document.getElementById('analytics-total-collections').textContent = '0';
+        document.getElementById('analytics-total-milk').textContent = '0 L';
+        document.getElementById('analytics-avg-per-farmer').textContent = '0 L';
+        document.getElementById('analytics-avg-fat').textContent = '0%';
+        document.getElementById('analytics-max-fat').textContent = '0%';
+        document.getElementById('analytics-min-fat').textContent = '0%';
+        document.getElementById('analytics-grade').textContent = '-';
+        document.getElementById('analytics-peak-time').textContent = '-';
+        
+        const topPerformersEl = document.getElementById('top-performers');
+        if (topPerformersEl) {
+            topPerformersEl.innerHTML = '<p class="muted"><i class="fas fa-trophy"></i> No data available yet</p>';
+        }
     }
 }
 
@@ -589,6 +583,252 @@ function updateTopPerformers(todayCollections) {
     `).join('');
 }
 
+// Initialize and update Collection Trend Chart (7 Days)
+function updateTrendChart() {
+    const canvas = document.getElementById('trendCanvas');
+    if (!canvas) return;
+    
+    // Get last 7 days
+    const today = new Date();
+    const last7Days = [];
+    const dailyTotals = [];
+    
+    for (let i = 6; i >= 0; i--) {
+        const date = new Date(today);
+        date.setDate(date.getDate() - i);
+        date.setHours(0, 0, 0, 0);
+        const dateStr = date.toISOString().split('T')[0];
+        
+        last7Days.push(date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }));
+        
+        // Calculate total milk for this day
+        const dayStart = date.getTime();
+        const dayEnd = dayStart + (24 * 60 * 60 * 1000);
+        
+        const dayCollections = collectionsData.filter(c => {
+            if (!c.timestamp && !c.createdAt) return false;
+            
+            let timestampMs;
+            if (c.timestamp) {
+                if (typeof c.timestamp === 'string') {
+                    timestampMs = new Date(c.timestamp).getTime();
+                } else if (c.timestamp.toDate) {
+                    timestampMs = c.timestamp.toDate().getTime();
+                }
+            }
+            
+            if (!timestampMs && c.createdAt) {
+                timestampMs = new Date(c.createdAt).getTime();
+            }
+            
+            if (!timestampMs) return false;
+            
+            return timestampMs >= dayStart && timestampMs < dayEnd;
+        });
+        
+        const totalMilk = dayCollections.reduce((sum, c) => sum + c.quantity, 0);
+        dailyTotals.push(totalMilk);
+    }
+    
+    // Destroy existing chart if it exists
+    if (trendChart) {
+        trendChart.destroy();
+    }
+    
+    // Create new chart
+    const ctx = canvas.getContext('2d');
+    trendChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: last7Days,
+            datasets: [{
+                label: 'Milk Collected (Liters)',
+                data: dailyTotals,
+                borderColor: '#00ff88',
+                backgroundColor: 'rgba(0, 255, 136, 0.1)',
+                borderWidth: 3,
+                fill: true,
+                tension: 0.4,
+                pointRadius: 5,
+                pointHoverRadius: 7,
+                pointBackgroundColor: '#00ff88',
+                pointBorderColor: '#0a0a0a',
+                pointBorderWidth: 2
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: true,
+                    labels: {
+                        color: '#a0a0a0',
+                        font: { size: 12 }
+                    }
+                },
+                tooltip: {
+                    backgroundColor: 'rgba(10, 10, 10, 0.9)',
+                    titleColor: '#00ff88',
+                    bodyColor: '#ffffff',
+                    borderColor: '#00ff88',
+                    borderWidth: 1,
+                    padding: 12,
+                    displayColors: false,
+                    callbacks: {
+                        label: function(context) {
+                            return context.parsed.y.toFixed(1) + ' Liters';
+                        }
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        color: '#666',
+                        callback: function(value) {
+                            return value + 'L';
+                        }
+                    },
+                    grid: {
+                        color: 'rgba(255, 255, 255, 0.05)'
+                    }
+                },
+                x: {
+                    ticks: {
+                        color: '#666'
+                    },
+                    grid: {
+                        color: 'rgba(255, 255, 255, 0.05)'
+                    }
+                }
+            }
+        }
+    });
+}
+
+// Initialize and update Quality Distribution Chart
+function updateQualityChart() {
+    const canvas = document.getElementById('qualityCanvas');
+    if (!canvas) return;
+    
+    // Get today's collections
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const todayStart = today.getTime();
+    const todayEnd = todayStart + (24 * 60 * 60 * 1000);
+    
+    const todayCollections = collectionsData.filter(c => {
+        if (!c.timestamp && !c.createdAt) return false;
+        
+        let timestampMs;
+        if (c.timestamp) {
+            if (typeof c.timestamp === 'string') {
+                timestampMs = new Date(c.timestamp).getTime();
+            } else if (c.timestamp.toDate) {
+                timestampMs = c.timestamp.toDate().getTime();
+            }
+        }
+        
+        if (!timestampMs && c.createdAt) {
+            timestampMs = new Date(c.createdAt).getTime();
+        }
+        
+        if (!timestampMs) return false;
+        
+        return timestampMs >= todayStart && timestampMs < todayEnd;
+    });
+    
+    if (todayCollections.length === 0) {
+        // Show placeholder message
+        if (qualityChart) {
+            qualityChart.destroy();
+            qualityChart = null;
+        }
+        return;
+    }
+    
+    // Categorize by quality
+    const qualityCategories = {
+        'Premium (>4.5%)': 0,
+        'Good (4.0-4.5%)': 0,
+        'Average (3.5-4.0%)': 0,
+        'Below Average (<3.5%)': 0
+    };
+    
+    todayCollections.forEach(c => {
+        const fat = c.fatContent;
+        if (fat > 4.5) {
+            qualityCategories['Premium (>4.5%)']++;
+        } else if (fat >= 4.0) {
+            qualityCategories['Good (4.0-4.5%)']++;
+        } else if (fat >= 3.5) {
+            qualityCategories['Average (3.5-4.0%)']++;
+        } else {
+            qualityCategories['Below Average (<3.5%)']++;
+        }
+    });
+    
+    // Destroy existing chart if it exists
+    if (qualityChart) {
+        qualityChart.destroy();
+    }
+    
+    // Create new chart
+    const ctx = canvas.getContext('2d');
+    qualityChart = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            labels: Object.keys(qualityCategories),
+            datasets: [{
+                data: Object.values(qualityCategories),
+                backgroundColor: [
+                    '#00ff88',  // Premium - Green
+                    '#00aeff',  // Good - Blue
+                    '#ff8800',  // Average - Orange
+                    '#ff0066'   // Below Average - Red
+                ],
+                borderColor: '#0a0a0a',
+                borderWidth: 2
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: true,
+                    position: 'bottom',
+                    labels: {
+                        color: '#a0a0a0',
+                        font: { size: 11 },
+                        padding: 15,
+                        usePointStyle: true
+                    }
+                },
+                tooltip: {
+                    backgroundColor: 'rgba(10, 10, 10, 0.9)',
+                    titleColor: '#00ff88',
+                    bodyColor: '#ffffff',
+                    borderColor: '#00ff88',
+                    borderWidth: 1,
+                    padding: 12,
+                    callbacks: {
+                        label: function(context) {
+                            const label = context.label || '';
+                            const value = context.parsed;
+                            const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                            const percentage = ((value / total) * 100).toFixed(1);
+                            return label + ': ' + value + ' (' + percentage + '%)';
+                        }
+                    }
+                }
+            }
+        }
+    });
+}
+
 // Utility functions
 function formatDateTime(isoString) {
     if (!isoString) return '-';
@@ -662,6 +902,8 @@ function refreshFeed() {
         updateAllStats();
         renderFeed();
         renderFarmers();
+        updateTrendChart();
+        updateQualityChart();
         showNotification('Data refreshed', 'success');
     }
 }
