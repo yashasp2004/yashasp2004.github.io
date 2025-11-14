@@ -395,6 +395,7 @@ function updateAllStats() {
 
 // Update analytics section (works for both Firebase and localStorage)
 function updateAnalyticsSection() {
+    // Calculate TODAY'S statistics
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     const todayStart = today.getTime();
@@ -403,20 +404,15 @@ function updateAnalyticsSection() {
     const todayCollections = collectionsData.filter(c => {
         if (!c.timestamp && !c.createdAt) return false;
         
-        // Handle both string timestamps and Firestore Timestamp objects
         let timestampMs;
-        
-        // Try timestamp field first
         if (c.timestamp) {
             if (typeof c.timestamp === 'string') {
                 timestampMs = new Date(c.timestamp).getTime();
             } else if (c.timestamp.toDate) {
-                // Firestore Timestamp object
                 timestampMs = c.timestamp.toDate().getTime();
             }
         }
         
-        // Fallback to createdAt if timestamp didn't work
         if (!timestampMs && c.createdAt) {
             timestampMs = new Date(c.createdAt).getTime();
         }
@@ -426,16 +422,36 @@ function updateAnalyticsSection() {
         return timestampMs >= todayStart && timestampMs < todayEnd;
     });
     
+    // Update TODAY'S statistics
     if (todayCollections.length > 0) {
-        const totalMilk = todayCollections.reduce((sum, c) => sum + c.quantity, 0);
-        const uniqueFarmers = new Set(todayCollections.map(c => c.farmerId));
-        const avgFat = todayCollections.reduce((sum, c) => sum + c.fatContent, 0) / todayCollections.length;
-        const maxFat = Math.max(...todayCollections.map(c => c.fatContent));
-        const minFat = Math.min(...todayCollections.map(c => c.fatContent));
-        const grade = avgFat >= 4.5 ? 'A+' : avgFat >= 4.0 ? 'A' : avgFat >= 3.5 ? 'B' : 'C';
+        const todayMilk = todayCollections.reduce((sum, c) => sum + c.quantity, 0);
+        const todayFarmers = new Set(todayCollections.map(c => c.farmerId));
+        const todayAvgFat = todayCollections.reduce((sum, c) => sum + c.fatContent, 0) / todayCollections.length;
         
-        // Update analytics
-        document.getElementById('analytics-total-collections').textContent = todayCollections.length;
+        document.getElementById('analytics-today-collections').textContent = todayCollections.length;
+        document.getElementById('analytics-today-milk').textContent = todayMilk.toFixed(1) + ' L';
+        document.getElementById('analytics-today-farmers').textContent = todayFarmers.size;
+        document.getElementById('analytics-today-fat').textContent = todayAvgFat.toFixed(1) + '%';
+    } else {
+        document.getElementById('analytics-today-collections').textContent = '0';
+        document.getElementById('analytics-today-milk').textContent = '0 L';
+        document.getElementById('analytics-today-farmers').textContent = '0';
+        document.getElementById('analytics-today-fat').textContent = '0%';
+    }
+    
+    // Calculate ALL-TIME statistics
+    const allCollections = collectionsData;
+    
+    if (allCollections.length > 0) {
+        const totalMilk = allCollections.reduce((sum, c) => sum + c.quantity, 0);
+        const uniqueFarmers = new Set(allCollections.map(c => c.farmerId));
+        const avgFat = allCollections.reduce((sum, c) => sum + c.fatContent, 0) / allCollections.length;
+        const maxFat = Math.max(...allCollections.map(c => c.fatContent));
+        const minFat = Math.min(...allCollections.map(c => c.fatContent));
+        const grade = getQualityGrade(avgFat);
+        
+        // Update all-time analytics
+        document.getElementById('analytics-total-collections').textContent = allCollections.length;
         document.getElementById('analytics-total-milk').textContent = totalMilk.toFixed(1) + ' L';
         document.getElementById('analytics-avg-per-farmer').textContent = 
             (uniqueFarmers.size > 0 ? (totalMilk / uniqueFarmers.size).toFixed(1) : 0) + ' L';
@@ -444,8 +460,8 @@ function updateAnalyticsSection() {
         document.getElementById('analytics-min-fat').textContent = minFat.toFixed(1) + '%';
         document.getElementById('analytics-grade').textContent = grade;
         
-        // Peak time
-        const hours = todayCollections.map(c => {
+        // Peak time (all-time)
+        const hours = allCollections.map(c => {
             let timestamp;
             if (c.timestamp) {
                 timestamp = c.timestamp.toDate ? c.timestamp.toDate() : new Date(c.timestamp);
@@ -459,10 +475,10 @@ function updateAnalyticsSection() {
         ).pop();
         document.getElementById('analytics-peak-time').textContent = peakHour + ':00';
         
-        // Top performers
-        updateTopPerformers(todayCollections);
+        // Top performers (all-time)
+        updateTopPerformers(allCollections);
     } else {
-        // No data today - show zeros
+        // No data - show zeros
         document.getElementById('analytics-total-collections').textContent = '0';
         document.getElementById('analytics-total-milk').textContent = '0 L';
         document.getElementById('analytics-avg-per-farmer').textContent = '0 L';
@@ -537,18 +553,18 @@ function renderFarmers() {
 }
 
 // Update Top Performers section
-function updateTopPerformers(todayCollections) {
+function updateTopPerformers(collections) {
     const topPerformersEl = document.getElementById('top-performers');
     if (!topPerformersEl) return;
     
-    if (todayCollections.length === 0) {
+    if (collections.length === 0) {
         topPerformersEl.innerHTML = '<p class="muted"><i class="fas fa-trophy"></i> No data available yet</p>';
         return;
     }
     
-    // Calculate farmer totals
+    // Calculate farmer totals for all-time
     const farmerTotals = {};
-    todayCollections.forEach(c => {
+    collections.forEach(c => {
         if (!farmerTotals[c.farmerId]) {
             farmerTotals[c.farmerId] = {
                 name: c.farmerName,
@@ -581,6 +597,31 @@ function updateTopPerformers(todayCollections) {
             </div>
         </div>
     `).join('');
+}
+
+// Calculate quality grade based on fat percentage
+function getQualityGrade(fatPercent) {
+    if (fatPercent >= 8.0) return 'A+';      // 8% and above - Premium
+    if (fatPercent >= 6.5) return 'A';       // 6.5% - 7.9% - Excellent
+    if (fatPercent >= 5.5) return 'B+';      // 5.5% - 6.4% - Very Good
+    if (fatPercent >= 4.5) return 'B';       // 4.5% - 5.4% - Good
+    if (fatPercent >= 3.5) return 'C+';      // 3.5% - 4.4% - Above Average
+    if (fatPercent >= 2.5) return 'C';       // 2.5% - 3.4% - Average
+    return 'F';                               // Below 2.5% - Fail
+}
+
+// Get color for quality grade
+function getGradeColor(grade) {
+    const colors = {
+        'A+': '#00ff88',  // Bright green
+        'A': '#00dd77',   // Green
+        'B+': '#00aeff',  // Bright blue
+        'B': '#0088dd',   // Blue
+        'C+': '#ff8800',  // Orange
+        'C': '#ff6600',   // Dark orange
+        'F': '#ff0066'    // Red
+    };
+    return colors[grade] || '#999';
 }
 
 // Initialize and update Collection Trend Chart (7 Days)
@@ -713,62 +754,52 @@ function updateQualityChart() {
     const canvas = document.getElementById('qualityCanvas');
     if (!canvas) return;
     
-    // Get today's collections
+    // Get last 7 days
     const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    const todayStart = today.getTime();
-    const todayEnd = todayStart + (24 * 60 * 60 * 1000);
+    const last7Days = [];
+    const avgFatPerDay = [];
     
-    const todayCollections = collectionsData.filter(c => {
-        if (!c.timestamp && !c.createdAt) return false;
+    for (let i = 6; i >= 0; i--) {
+        const date = new Date(today);
+        date.setDate(date.getDate() - i);
+        date.setHours(0, 0, 0, 0);
+        const dateStr = date.toISOString().split('T')[0];
         
-        let timestampMs;
-        if (c.timestamp) {
-            if (typeof c.timestamp === 'string') {
-                timestampMs = new Date(c.timestamp).getTime();
-            } else if (c.timestamp.toDate) {
-                timestampMs = c.timestamp.toDate().getTime();
+        last7Days.push(date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }));
+        
+        // Calculate average fat content for this day
+        const dayStart = date.getTime();
+        const dayEnd = dayStart + (24 * 60 * 60 * 1000);
+        
+        const dayCollections = collectionsData.filter(c => {
+            if (!c.timestamp && !c.createdAt) return false;
+            
+            let timestampMs;
+            if (c.timestamp) {
+                if (typeof c.timestamp === 'string') {
+                    timestampMs = new Date(c.timestamp).getTime();
+                } else if (c.timestamp.toDate) {
+                    timestampMs = c.timestamp.toDate().getTime();
+                }
             }
-        }
+            
+            if (!timestampMs && c.createdAt) {
+                timestampMs = new Date(c.createdAt).getTime();
+            }
+            
+            if (!timestampMs) return false;
+            
+            return timestampMs >= dayStart && timestampMs < dayEnd;
+        });
         
-        if (!timestampMs && c.createdAt) {
-            timestampMs = new Date(c.createdAt).getTime();
-        }
-        
-        if (!timestampMs) return false;
-        
-        return timestampMs >= todayStart && timestampMs < todayEnd;
-    });
-    
-    if (todayCollections.length === 0) {
-        // Show placeholder message
-        if (qualityChart) {
-            qualityChart.destroy();
-            qualityChart = null;
-        }
-        return;
-    }
-    
-    // Categorize by quality
-    const qualityCategories = {
-        'Premium (>4.5%)': 0,
-        'Good (4.0-4.5%)': 0,
-        'Average (3.5-4.0%)': 0,
-        'Below Average (<3.5%)': 0
-    };
-    
-    todayCollections.forEach(c => {
-        const fat = c.fatContent;
-        if (fat > 4.5) {
-            qualityCategories['Premium (>4.5%)']++;
-        } else if (fat >= 4.0) {
-            qualityCategories['Good (4.0-4.5%)']++;
-        } else if (fat >= 3.5) {
-            qualityCategories['Average (3.5-4.0%)']++;
+        // Calculate average fat for the day
+        if (dayCollections.length > 0) {
+            const avgFat = dayCollections.reduce((sum, c) => sum + c.fatContent, 0) / dayCollections.length;
+            avgFatPerDay.push(avgFat);
         } else {
-            qualityCategories['Below Average (<3.5%)']++;
+            avgFatPerDay.push(0);
         }
-    });
+    }
     
     // Destroy existing chart if it exists
     if (qualityChart) {
@@ -778,19 +809,17 @@ function updateQualityChart() {
     // Create new chart
     const ctx = canvas.getContext('2d');
     qualityChart = new Chart(ctx, {
-        type: 'doughnut',
+        type: 'bar',
         data: {
-            labels: Object.keys(qualityCategories),
+            labels: last7Days,
             datasets: [{
-                data: Object.values(qualityCategories),
-                backgroundColor: [
-                    '#00ff88',  // Premium - Green
-                    '#00aeff',  // Good - Blue
-                    '#ff8800',  // Average - Orange
-                    '#ff0066'   // Below Average - Red
-                ],
-                borderColor: '#0a0a0a',
-                borderWidth: 2
+                label: 'Average Fat %',
+                data: avgFatPerDay,
+                backgroundColor: avgFatPerDay.map(fat => getGradeColor(getQualityGrade(fat))),
+                borderColor: avgFatPerDay.map(fat => getGradeColor(getQualityGrade(fat))),
+                borderWidth: 2,
+                borderRadius: 8,
+                borderSkipped: false
             }]
         },
         options: {
@@ -799,12 +828,9 @@ function updateQualityChart() {
             plugins: {
                 legend: {
                     display: true,
-                    position: 'bottom',
                     labels: {
                         color: '#a0a0a0',
-                        font: { size: 11 },
-                        padding: 15,
-                        usePointStyle: true
+                        font: { size: 12 }
                     }
                 },
                 tooltip: {
@@ -814,14 +840,46 @@ function updateQualityChart() {
                     borderColor: '#00ff88',
                     borderWidth: 1,
                     padding: 12,
+                    displayColors: true,
                     callbacks: {
                         label: function(context) {
-                            const label = context.label || '';
-                            const value = context.parsed;
-                            const total = context.dataset.data.reduce((a, b) => a + b, 0);
-                            const percentage = ((value / total) * 100).toFixed(1);
-                            return label + ': ' + value + ' (' + percentage + '%)';
+                            const value = context.parsed.y;
+                            if (value === 0) return 'No data';
+                            const grade = getQualityGrade(value);
+                            const gradeNames = {
+                                'A+': 'Premium',
+                                'A': 'Excellent',
+                                'B+': 'Very Good',
+                                'B': 'Good',
+                                'C+': 'Above Average',
+                                'C': 'Average',
+                                'F': 'Fail'
+                            };
+                            return value.toFixed(2) + '% (Grade: ' + grade + ' - ' + gradeNames[grade] + ')';
                         }
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    max: 17,
+                    ticks: {
+                        color: '#666',
+                        callback: function(value) {
+                            return value + '%';
+                        }
+                    },
+                    grid: {
+                        color: 'rgba(255, 255, 255, 0.05)'
+                    }
+                },
+                x: {
+                    ticks: {
+                        color: '#666'
+                    },
+                    grid: {
+                        color: 'rgba(255, 255, 255, 0.05)'
                     }
                 }
             }
