@@ -511,7 +511,27 @@ function renderFeed() {
         return;
     }
     
-    tbody.innerHTML = collectionsData.slice(0, 50).map(c => `
+    // Sort by timestamp - latest first
+    const sortedCollections = [...collectionsData].sort((a, b) => {
+        let timeA, timeB;
+        
+        // Handle different timestamp formats
+        if (a.timestamp) {
+            timeA = a.timestamp.toDate ? a.timestamp.toDate().getTime() : new Date(a.timestamp).getTime();
+        } else if (a.createdAt) {
+            timeA = new Date(a.createdAt).getTime();
+        }
+        
+        if (b.timestamp) {
+            timeB = b.timestamp.toDate ? b.timestamp.toDate().getTime() : new Date(b.timestamp).getTime();
+        } else if (b.createdAt) {
+            timeB = new Date(b.createdAt).getTime();
+        }
+        
+        return timeB - timeA; // Latest first
+    });
+    
+    tbody.innerHTML = sortedCollections.slice(0, 50).map(c => `
         <tr>
             <td>${formatDateTime(c.timestamp)}</td>
             <td><span class="badge">${c.farmerId}</span></td>
@@ -540,7 +560,14 @@ function renderFarmers() {
         return;
     }
     
-    tbody.innerHTML = farmers.map(f => `
+    // Sort by last deposit - latest first
+    const sortedFarmers = farmers.sort((a, b) => {
+        if (!a.lastDeposit) return 1;
+        if (!b.lastDeposit) return -1;
+        return new Date(b.lastDeposit).getTime() - new Date(a.lastDeposit).getTime();
+    });
+    
+    tbody.innerHTML = sortedFarmers.map(f => `
         <tr>
             <td><span class="badge">${f.id}</span></td>
             <td>${f.name}</td>
