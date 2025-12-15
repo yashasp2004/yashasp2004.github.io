@@ -29,7 +29,7 @@ exports.addMilkCollection = functions.https.onRequest((req, res) => {
 
     try {
       const {fingerprintId, farmerId, farmerName,
-        quantity, fatContent, deviceId} = req.body;
+        quantity, fatContent, phValue, temperature, deviceId} = req.body;
 
       // Validate required fields
       if (!quantity || !deviceId) {
@@ -84,6 +84,8 @@ exports.addMilkCollection = functions.https.onRequest((req, res) => {
         fingerprintId: fingerprintId || null,
         quantity: parseFloat(quantity),
         fatContent: parseFloat(fatContent) || 0,
+        phValue: phValue !== undefined ? parseFloat(phValue) : null,
+        temperature: temperature !== undefined ? parseFloat(temperature) : null,
         deviceId: deviceId,
         status: "Verified",
         createdAt: new Date().toISOString(),
@@ -132,6 +134,8 @@ exports.addMilkCollection = functions.https.onRequest((req, res) => {
         farmerName: finalFarmerName,
         quantity: parseFloat(quantity),
         fatContent: parseFloat(fatContent) || 0,
+        phValue: phValue !== undefined ? parseFloat(phValue) : null,
+        temperature: temperature !== undefined ? parseFloat(temperature) : null,
         timestamp: new Date().toISOString(),
       });
     } catch (error) {
