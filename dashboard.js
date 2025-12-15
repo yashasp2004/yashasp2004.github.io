@@ -65,14 +65,25 @@ function initDashboard() {
         form.addEventListener('submit', handleCollection);
     }
     
-    // Auto-generate random fat content when quantity changes
+    // Auto-generate random sensor values when quantity changes
     const quantityInput = document.getElementById('milk-quantity');
     if (quantityInput) {
         quantityInput.addEventListener('input', function() {
             const fatInput = document.getElementById('fat-content');
+            const phInput = document.getElementById('ph-value');
+            const tempInput = document.getElementById('temperature');
+            
             // Simulate fat sensor: random value between 3.5% and 5.5%
             const simulatedFat = (3.5 + Math.random() * 2).toFixed(1);
             fatInput.value = simulatedFat;
+            
+            // Simulate pH sensor: random value between 6.5 and 6.8 (normal milk pH)
+            const simulatedPH = (6.5 + Math.random() * 0.3).toFixed(2);
+            phInput.value = simulatedPH;
+            
+            // Simulate temperature sensor: random value between 20°C and 30°C
+            const simulatedTemp = (20 + Math.random() * 10).toFixed(1);
+            tempInput.value = simulatedTemp;
         });
     }
 }
@@ -143,6 +154,8 @@ async function handleCollection(event) {
     const farmerName = document.getElementById('farmer-name').value;
     const quantity = parseFloat(document.getElementById('milk-quantity').value);
     const fatContent = parseFloat(document.getElementById('fat-content').value);
+    const phValue = parseFloat(document.getElementById('ph-value').value);
+    const temperature = parseFloat(document.getElementById('temperature').value);
     const deviceId = document.getElementById('device-id').value;
     
     const collection = {
@@ -150,6 +163,8 @@ async function handleCollection(event) {
         farmerName: farmerName,
         quantity: quantity,
         fatContent: fatContent,
+        phValue: phValue,
+        temperature: temperature,
         deviceId: deviceId,
         status: 'Verified'
     };
@@ -342,6 +357,20 @@ function updateAllStats() {
         : 0;
     document.getElementById('avg-fat').textContent = avgFat.toFixed(1) + '%';
     
+    // Calculate average pH
+    const collectionsWithPH = todayCollections.filter(c => c.phValue !== undefined && c.phValue !== null);
+    const avgPH = collectionsWithPH.length > 0
+        ? collectionsWithPH.reduce((sum, c) => sum + c.phValue, 0) / collectionsWithPH.length
+        : 0;
+    document.getElementById('avg-ph').textContent = avgPH > 0 ? avgPH.toFixed(2) : 'N/A';
+    
+    // Calculate average temperature
+    const collectionsWithTemp = todayCollections.filter(c => c.temperature !== undefined && c.temperature !== null);
+    const avgTemp = collectionsWithTemp.length > 0
+        ? collectionsWithTemp.reduce((sum, c) => sum + c.temperature, 0) / collectionsWithTemp.length
+        : 0;
+    document.getElementById('avg-temp').textContent = avgTemp > 0 ? avgTemp.toFixed(1) + '°C' : 'N/A';
+    
     // Update analytics section
     updateAnalyticsSection();
     
@@ -503,7 +532,7 @@ function renderFeed() {
     if (collectionsData.length === 0) {
         tbody.innerHTML = `
             <tr class="no-data">
-                <td colspan="7">
+                <td colspan="9">
                     <i class="fas fa-info-circle"></i> No collections yet. Add your first entry above!
                 </td>
             </tr>
@@ -538,6 +567,8 @@ function renderFeed() {
             <td>${c.farmerName}</td>
             <td><strong>${c.quantity.toFixed(1)}</strong></td>
             <td>${c.fatContent.toFixed(1)}%</td>
+            <td>${c.phValue !== undefined ? c.phValue.toFixed(2) : 'N/A'}</td>
+            <td>${c.temperature !== undefined ? c.temperature.toFixed(1) : 'N/A'}</td>
             <td><span class="device-badge">${c.deviceId}</span></td>
             <td><span class="status-badge ${c.status.toLowerCase()}">${c.status}</span></td>
         </tr>
