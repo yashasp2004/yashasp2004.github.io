@@ -93,6 +93,8 @@ async function addCollection(data) {
       farmerName: data.farmerName,
       quantity: parseFloat(data.quantity),
       fatContent: parseFloat(data.fatContent),
+      phValue: data.phValue !== undefined ? parseFloat(data.phValue) : null,
+      temperature: data.temperature !== undefined ? parseFloat(data.temperature) : null,
       deviceId: data.deviceId,
       status: data.status || 'Verified',
       createdAt: new Date().toISOString()
